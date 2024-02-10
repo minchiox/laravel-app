@@ -29,5 +29,10 @@ Route::get('/', [CustomAuthController::class, 'showHome'])->name('/');
 Route::get('dashboard', [CustomAuthController::class, 'showHome2'])->name('dashboard');
 
 //Auth::routes();
+//rotte gestione user
 Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'index'])->name('user.profile');
 Route::post('/profile', [App\Http\Controllers\ProfileController::class, 'store'])->name('user.profile.store');
+
+//rotte quiz
+Route::get('/quizzes', [App\Http\Controllers\QuizController::class, 'index'])->name('quiz.index');
+Route::post('/quizzes', [App\Http\Controllers\QuizController::class, 'store'])->name('quiz.store');
