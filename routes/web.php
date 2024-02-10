@@ -27,3 +27,7 @@ Route::get('login', [CustomAuthController::class, 'showLoginForm'])->name('login
 Route::get('register', [CustomAuthController::class, 'showRegisterForm'])->name('register');
 Route::get('/', [CustomAuthController::class, 'showHome'])->name('/');
 Route::get('dashboard', [CustomAuthController::class, 'showHome2'])->name('dashboard');
+
+//Auth::routes();
+Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'index'])->name('user.profile');
+Route::post('/profile', [App\Http\Controllers\ProfileController::class, 'store'])->name('user.profile.store');
