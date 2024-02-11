@@ -30,13 +30,15 @@
                         </a>
 
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <a href="{{ route('dashboard') }}" class="dropdown-item">Dashboard</a>
                             <a href="{{ route('user.profile') }}" class="dropdown-item">Profile</a>
-                            <a class="dropdown-item" href="{{ route('signout') }}"
-                               onclick="event.preventDefault();
-                             document.getElementById('logout-form').submit();">
+                            @if(Auth::user()->isTeacher)
+                                <a href="{{ route('quiz.index') }}" class="dropdown-item">lista quiz creati</a>
+                                <a href="{{ route('quiz.create') }}" class="dropdown-item">crea quiz</a>
+                            @endif
+                            <a class="dropdown-item" href="" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                 {{ __('Logout') }}
                             </a>
-
                             <form id="logout-form" action="{{ route('signout') }}" method="POST" class="d-none">
                                 @csrf
                             </form>

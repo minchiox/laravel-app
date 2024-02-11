@@ -18,6 +18,7 @@ class Quiz extends Model
     protected $fillable = [
         'question',
         'answer',
+        'answer-bool',
         'answer-text',
     ];
 }

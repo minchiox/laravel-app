@@ -39,6 +39,7 @@ class CustomAuthController extends Controller
             'password' => 'required|min:6',
         ]);
         $data = $request->all();
+        $data['isTeacher'] = $request->has('isTeacher');
         $this->create($data);
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
@@ -51,7 +52,8 @@ class CustomAuthController extends Controller
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
-            'password' => Hash::make($data['password'])
+            'password' => Hash::make($data['password']),
+            'isTeacher' => $data['isTeacher']
         ]);
     }
     public function dashboard()
@@ -67,7 +69,7 @@ class CustomAuthController extends Controller
         Auth::logout();
         return Redirect('login');
     }
-    public function showLoginForm()
+    /*public function showLoginForm()
     {
         if (Auth::check()) {
             return redirect()->route('dashboard');
@@ -98,7 +100,7 @@ class CustomAuthController extends Controller
         } else {
             return redirect()->route('login'); // Reindirizza all pagina di login se l'utente non è autenticato
         }
-    }
+    }*/
 }
 
 

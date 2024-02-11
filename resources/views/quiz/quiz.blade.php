@@ -1,5 +1,4 @@
 @extends('auth.layouts')
-
 @section('content')
     <div class="container">
         <div class="row justify-content-center">
@@ -12,61 +11,54 @@
                             @csrf
 
                             @if (session('success'))
-                                <div class="alert alert-success" role="alert" class="text-danger">
+                                <div class="alert alert-success" role="alert">
                                     {{ session('success') }}
                                 </div>
                             @endif
 
-                            <div class="row mb-0">
-                                <div class="col-md-12 ">
-                                    <label for="question" class="form-label">Question: </label>
-                                    <input class="form-control" type="text" id="question" name="question" autofocus="" >
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <label for="question" class="form-label">{{ __('Question') }}:</label>
+                                    <input class="form-control" type="text" id="question" name="question" autofocus required>
                                     @error('question')
                                     <span role="alert" class="text-danger">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
+                                            <strong>{{ $message }}</strong>
+                                        </span>
                                     @enderror
                                 </div>
                             </div>
 
-                            <div class="row mb-0">
+                            <div class="row mb-3">
                                 <div class="col-md-12">
-                                    <label for="answer-type" class="form-label">Answer Type: </label>
-                                    <select name="answer-type" class="form-label" id="answer-type" autofocus="">
-                                        <option value="">Select an option</option>
-                                        <option value="open">Open Answer</option>
-                                        <option value="close">Close Answer</option>
+                                    <label for="answer-type" class="form-label">{{ __('Answer Type') }}:</label>
+                                    <select name="answer-type" class="form-select" id="answer-type" required>
+                                        <option value="">{{ __('Select an option') }}</option>
+                                        <option value="open">{{ __('Open Answer') }}</option>
+                                        <option value="close">{{ __('Close Answer') }}</option>
                                     </select>
                                     @error('answer-type')
                                     <span role="alert" class="text-danger">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
+                                            <strong>{{ $message }}</strong>
+                                        </span>
                                     @enderror
                                 </div>
                             </div>
 
-                            <div class="row mb-0">
+                            <div class="row mb-3">
                                 <div class="col-md-12">
-                                    <label for="answer" class="form-label">Answer:</label>
+                                    <label for="answer" class="form-label">{{ __('Answer') }}:</label>
+                                    <div id="inputToShow"></div>
                                     @error('answer')
                                     <span role="alert" class="text-danger">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
+                                            <strong>{{ $message }}</strong>
+                                        </span>
                                     @enderror
                                 </div>
                             </div>
 
-                            <div class="row mb-0">
-                                <div class="col-md-12" id="inputToShow">
-                                    <!-- guarda la funzione di javascrpit sotto -->
-                                </div>
-                            </div>
-
-                            <div class="row mb-0">
-                                <div class="col-md-12 offset-md-5">
-                                    <button type="submit" class="btn btn-primary">
-                                        {{ __('Upload new Quiz') }}
-                                    </button>
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <button type="submit" class="btn btn-primary">{{ __('Upload new Quiz') }}</button>
                                 </div>
                             </div>
                         </form>
@@ -76,7 +68,7 @@
         </div>
     </div>
 
-    <!-- funzione di javascrpit per mostrare a schermo le opzioni di risposta alla domanda -->
+    <!-- JavaScript per mostrare l'input appropriato in base alla selezione dell'utente -->
     <script>
         document.getElementById('answer-type').addEventListener('change', function() {
             var answertype = this.value;
@@ -84,17 +76,15 @@
 
             // Aggiunge l'input appropriato in base alla selezione
             if (answertype === 'open') {
-                inputToShow.innerHTML = '<input class="form-control" type="text" name="answer-text" id="answer-text">';
-                //se non è una risposta aperta allora mostrerà i radio button per risposta vera o falsa
+                inputToShow.innerHTML = '<input class="form-control" type="text" name="answer-text" id="answer-text" required>';
             } else if (answertype === 'close') {
-                inputToShow.innerHTML = '<label class="form-label" for="true">True</label>' +
-                    '<input type="radio" name="answer" id="answer-bool" value="1"> ' +
+                inputToShow.innerHTML = '<label class="form-check-label" for="answer-bool-true">{{ __('True') }}</label>' +
+                    '<input class="form-check-input" type="radio" name="answer-bool" id="answer-bool-true" value="1" required> ' +
                     '<br>' +
-                   ' <label class="form-label" for="false">False</label>' +
-                     '<input  type="radio" name="answer" id="answer-bool" value="0">';
-
-            }else  {
-                // nel caso in cui non dovesse essere selezionata nessuna opzione non mostrerà nulla per gestire gli errori
+                    '<label class="form-check-label" for="answer-bool-false">{{ __('False') }}</label>' +
+                    '<input class="form-check-input" type="radio" name="answer-bool" id="answer-bool-false" value="0" required>';
+            } else {
+                // Non mostra nulla se non è selezionata nessuna opzione
                 inputToShow.innerHTML = '';
             }
         });

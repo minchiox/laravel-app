@@ -48,11 +48,11 @@
                                 </li>
                             @endif
                         @else
-                            <a class="dropdown-item" href="{{ route('signout') }}"
+                            <!--<a class="dropdown-item" href="{{ route('signout') }}"
                                onclick="event.preventDefault();
                              document.getElementById('logout-form').submit();">
                                 {{ __('Logout') }}
-                            </a>
+                            </a>-->
 
                             <form id="logout-form" action="{{ route('signout') }}" method="POST" class="d-none">
                                 @csrf
