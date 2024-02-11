@@ -79,10 +79,10 @@
                 inputToShow.innerHTML = '<input class="form-control" type="text" name="answer-text" id="answer-text" required>';
             } else if (answertype === 'close') {
                 inputToShow.innerHTML = '<label class="form-check-label" for="answer-bool-true">{{ __('True') }}</label>' +
-                    '<input class="form-check-input" type="radio" name="answer-bool" id="answer-bool-true" value="1" required> ' +
+                    '<input class="form-check-input" type="radio" name="answer" id="answer-bool-true" value="1" required> ' +
                     '<br>' +
                     '<label class="form-check-label" for="answer-bool-false">{{ __('False') }}</label>' +
-                    '<input class="form-check-input" type="radio" name="answer-bool" id="answer-bool-false" value="0" required>';
+                    '<input class="form-check-input" type="radio" name="answer" id="answer-bool-false" value="0" required>';
             } else {
                 // Non mostra nulla se non è selezionata nessuna opzione
                 inputToShow.innerHTML = '';
