@@ -42,6 +42,7 @@
                         <th scope="col">Answer</th>
                         <th scope="col">Difficulty</th>
                         <th scope="col">Subject</th>
+                        <th scope="col">Points</th>
                         <th scope="col">Created at</th>
                         <th scope="col">Actions</th> <!-- Nuova colonna per le azioni -->
                     </tr>
@@ -57,6 +58,7 @@
                             @endif
                             <td>{{ $quiz->difficulty }}</td>
                             <td>{{ $quiz->subject }}</td>
+                            <td>{{ $quiz->points }}</td>
                             <td>{{ $quiz->created_at }}</td>
                             <td>
                                 <a href="{{ route('quiz.edit', $quiz->id) }}" class="btn btn-primary">{{ __('Edit') }}</a>

@@ -33,8 +33,8 @@
                             <a href="{{ route('dashboard') }}" class="dropdown-item">Dashboard</a>
                             <a href="{{ route('user.profile') }}" class="dropdown-item">Profile</a>
                             @if(Auth::user()->isTeacher)
-                                <a href="{{ route('quiz.index') }}" class="dropdown-item">lista quiz creati</a>
-                                <a href="{{ route('quiz.create') }}" class="dropdown-item">crea quiz</a>
+                                <a href="{{ route('quiz.index') }}" class="dropdown-item">Quiz List</a>
+                                <a href="{{ route('quiz.create') }}" class="dropdown-item">Make Quiz</a>
                             @endif
                             <a class="dropdown-item" href="" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                 {{ __('Logout') }}

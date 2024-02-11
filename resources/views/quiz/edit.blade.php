@@ -21,7 +21,7 @@
                             <div class="row mb-3">
                                 <div class="col-md-12">
                                     <label for="question" class="form-label">{{ __('Question') }}:</label>
-                                    <input class="form-control" type="text" id="question" name="question" autofocus required>
+                                    <input class="form-control" type="text" id="question" name="question" value="{{ $quiz->question }}" autofocus required>
                                     @error('question')
                                     <span role="alert" class="text-danger">
                                             <strong>{{ $message }}</strong>
@@ -33,7 +33,7 @@
                             <div class="row mb-3">
                                 <div class="col-md-12">
                                     <label for="answer-type" class="form-label">{{ __('Answer Type') }}:</label>
-                                    <select name="answer-type" class="form-select" id="answer-type" required>
+                                    <select name="answer-type" class="form-select" id="answer-type"  required>
                                         <option value="">{{ __('Select an option') }}</option>
                                         <option value="open">{{ __('Open Answer') }}</option>
                                         <option value="close">{{ __('Close Answer') }}</option>
@@ -57,6 +57,49 @@
                                     @enderror
                                 </div>
                             </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <label for="subject" class="form-label">{{ __('Subject') }} :</label>
+                                    <input class="form-control" type="text" id="subject" name="subject" value="{{ $quiz->subject }}" autofocus required>
+                                    @error('subject')
+                                    <span role="alert" class="text-danger">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <label for="difficulty" class="form-label">{{ __('Difficulty') }}:</label>
+                                    <select name="difficulty" class="form-select" id="difficulty" value="{{ $quiz->difficulty }}" required>
+                                        <option value="" >{{ __('Select an option') }}</option>
+                                        <option value="easy">{{ __('Easy') }}</option>
+                                        <option value="medium">{{ __('Medium') }}</option>
+                                        <option value="hard" >{{ __('Hard') }}</option>
+                                    </select>
+                                    @error('question')
+                                    <span role="alert" class="text-danger">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <label for="point" class="form-label">{{ __('Points') }}:</label>
+                                    <input class="form-control" type="number" id="points" name="points" value="{{ $quiz->points }}" autofocus required>
+                                    @error('points')
+                                    <span role="alert" class="text-danger">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+
+
 
                             <div class="row mb-3">
                                 <div class="col-md-12">
