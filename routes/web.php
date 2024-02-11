@@ -41,3 +41,11 @@ Route::post('/quizzes', [App\Http\Controllers\QuizController::class, 'store'])->
 
 Route::get('/quizzes/{id}/edit', [App\Http\Controllers\QuizController::class, 'edit'])->name('quiz.edit')->middleware(['auth', 'isTeacher']);
 Route::put('/quizzes/{id}', [App\Http\Controllers\QuizController::class, 'update'])->name('quiz.update')->middleware(['auth', 'isTeacher']);
+
+//rotte gestione librerie
+Route::get('/library', [App\Http\Controllers\LibraryController::class, 'index'])->name('library.library');
+Route::post('/library', [App\Http\Controllers\LibraryController::class, 'store'])->name('library.store');
+
+//rotte per gestione aggiunta di quiz ad una libreria
+Route::get('/library/{id}', [App\Http\Controllers\LibraryQuizController::class, 'addingQuiz'])->name('library.index');
+Route::post('/library/{id}', [App\Http\Controllers\LibraryQuizController::class, 'addQuizToLibrary'])->name('library.add');

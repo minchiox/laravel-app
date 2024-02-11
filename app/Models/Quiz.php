@@ -23,4 +23,9 @@ class Quiz extends Model
         'difficulty',
         'points',
     ];
+
+    public function library()
+    {
+        return $this->belongsToMany(Library::class);
+    }
 }
