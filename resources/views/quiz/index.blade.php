@@ -50,10 +50,10 @@
                     @foreach ($quizzes as $quiz)
                         <tr>
                             <td>{{ $quiz->question }}</td>
-                            @if (!is_null($quiz['answer-text']))
-                                <td>{{ $quiz['answer-text'] }}</td>
+                            @if (!is_null($quiz['answer_text']))
+                                <td>{{ $quiz['answer_text'] }}</td>
                             @else
-                                <td>{{ $quiz['answer-bool'] ? 'True' : 'False' }}</td>
+                                <td>{{ $quiz['answer'] ? 'True' : 'False' }}</td>
                             @endif
                             <td>{{ $quiz->difficulty }}</td>
                             <td>{{ $quiz->subject }}</td>

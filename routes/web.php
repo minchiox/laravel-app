@@ -32,7 +32,7 @@ Route::post('/profile', [App\Http\Controllers\ProfileController::class, 'store']
 //rotte quiz - Dove mostra i vari quiz e possono essere modificati o rimossi
 Route::get('/quizzes', [App\Http\Controllers\QuizController::class, 'list'])->name('quiz.list')->middleware(['auth', 'isTeacher']);
 Route::get('/quizzes', [App\Http\Controllers\QuizController::class, 'index'])->name('quiz.index')->middleware(['auth', 'isTeacher']);
-Route::get('/quizzes/search', [App\Http\Controllers\QuizController::class, 'list'])->name('quiz.search')->middleware(['auth', 'isTeacher']);
+Route::get('/quizzes/search', [App\Http\Controllers\QuizController::class, 'search'])->name('quiz.search')->middleware(['auth', 'isTeacher']);
 
 Route::delete('/quizzes/{id}', [App\Http\Controllers\QuizController::class, 'destroy'])->name('quiz.destroy')->middleware(['auth', 'isTeacher']);
 //rotte quiz - Creazione e store

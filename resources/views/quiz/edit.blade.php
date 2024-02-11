@@ -1,11 +1,11 @@
-@extends('auth.layouts')
 
+@extends('auth.layouts')
 @section('content')
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header">{{ __('Edit Quiz') }}</div>
+                    <div class="card-header">{{ __('Quiz Maker') }}</div>
 
                     <div class="card-body">
                         <form method="POST" action="{{ route('quiz.update', $quiz->id) }}" enctype="multipart/form-data">
@@ -21,11 +21,27 @@
                             <div class="row mb-3">
                                 <div class="col-md-12">
                                     <label for="question" class="form-label">{{ __('Question') }}:</label>
-                                    <input class="form-control" type="text" id="question" name="question" autofocus required value="{{ old('question', $quiz->question) }}">
+                                    <input class="form-control" type="text" id="question" name="question" autofocus required>
                                     @error('question')
                                     <span role="alert" class="text-danger">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <label for="answer-type" class="form-label">{{ __('Answer Type') }}:</label>
+                                    <select name="answer-type" class="form-select" id="answer-type" required>
+                                        <option value="">{{ __('Select an option') }}</option>
+                                        <option value="open">{{ __('Open Answer') }}</option>
+                                        <option value="close">{{ __('Close Answer') }}</option>
+                                    </select>
+                                    @error('answer-type')
+                                    <span role="alert" class="text-danger">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
                                     @enderror
                                 </div>
                             </div>
@@ -33,24 +49,18 @@
                             <div class="row mb-3">
                                 <div class="col-md-12">
                                     <label for="answer" class="form-label">{{ __('Answer') }}:</label>
-                                    <div id="inputToShow">
-                                        <label class="form-check-label" for="answer-bool-true">{{ __('True') }}</label>
-                                        <input class="form-check-input" type="radio" name="answer-bool" id="answer-bool-true" value="1" {{ old('answer-bool', $quiz->answer_bool) == '1' ? 'checked' : '' }} required>
-                                        <br>
-                                        <label class="form-check-label" for="answer-bool-false">{{ __('False') }}</label>
-                                        <input class="form-check-input" type="radio" name="answer-bool" id="answer-bool-false" value="0" {{ old('answer-bool', $quiz->answer_bool) == '0' ? 'checked' : '' }} required>
-                                    </div>
-                                    @error('answer-bool')
+                                    <div id="inputToShow"></div>
+                                    @error('answer')
                                     <span role="alert" class="text-danger">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
+                                            <strong>{{ $message }}</strong>
+                                        </span>
                                     @enderror
                                 </div>
                             </div>
 
                             <div class="row mb-3">
                                 <div class="col-md-12">
-                                    <button type="submit" class="btn btn-primary">{{ __('Update Quiz') }}</button>
+                                    <button type="submit" class="btn btn-primary">{{ __('Edit Quiz') }}</button>
                                 </div>
                             </div>
                         </form>
@@ -62,14 +72,22 @@
 
     <!-- JavaScript per mostrare l'input appropriato in base alla selezione dell'utente -->
     <script>
-        document.getElementById('answer-bool-true').addEventListener('change', function() {
+        document.getElementById('answer-type').addEventListener('change', function() {
+            var answertype = this.value;
             var inputToShow = document.getElementById('inputToShow');
 
-            // Mostra l'input solo se la risposta è True
-            if (this.checked) {
-                inputToShow.style.display = 'block';
+            // Aggiunge l'input appropriato in base alla selezione
+            if (answertype === 'open') {
+                inputToShow.innerHTML = '<input class="form-control" type="text" name="answer_text" id="answer-text" required>';
+            } else if (answertype === 'close') {
+                inputToShow.innerHTML = '<label class="form-check-label" for="answer-bool-true">{{ __('True') }}</label>' +
+                    '<input class="form-check-input" type="radio" name="answer" id="answer-bool-true" value="1" required> ' +
+                    '<br>' +
+                    '<label class="form-check-label" for="answer-bool-false">{{ __('False') }}</label>' +
+                    '<input class="form-check-input" type="radio" name="answer" id="answer-bool-false" value="0" required>';
             } else {
-                inputToShow.style.display = 'none';
+                // Non mostra nulla se non è selezionata nessuna opzione
+                inputToShow.innerHTML = '';
             }
         });
     </script>

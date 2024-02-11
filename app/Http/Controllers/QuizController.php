@@ -37,6 +37,27 @@ class QuizController extends Controller
 
         return view('quiz.index', compact('quizzes'));
     }
+    public function search(Request $request)
+    {
+        $query = Quiz::query();
+
+        // Applica i filtri di ricerca
+        if ($request->filled('question')) {
+            $query->where('question', 'like', '%' . $request->input('question') . '%');
+        }
+
+        if ($request->filled('difficulty')) {
+            $query->where('difficulty', $request->input('difficulty'));
+        }
+
+        if ($request->filled('subject')) {
+            $query->where('subject', 'like', '%' . $request->input('subject') . '%');
+        }
+
+        $quizzes = $query->get();
+
+        return view('quiz.index', compact('quizzes'));
+    }
     public function list()
     {
         $quizzes = Quiz::all();
@@ -71,11 +92,23 @@ class QuizController extends Controller
         ]);
 
         $quiz = Quiz::findOrFail($id);
-        $quiz->question = $request->question;
-        // Aggiorna altri campi del quiz se necessario
+        //$quiz->question = $request->question;
+        $input = $request->all();
+
+        //Se la risposta è booleana
+        if($request->filled('answer')){
+            unset($input['answer_text']);
+            $input['answer_text'] = null;
+
+        }
+        else
+        {
+            unset($input['answer']);
+            $input['answer'] = null;
+        }
 
         // Salva le modifiche
-        $quiz->save();
+        $quiz->update($input);
 
         // Reindirizza con un messaggio di successo
         return redirect()->route('quiz.edit', $id)->with('success', 'Quiz updated successfully.');

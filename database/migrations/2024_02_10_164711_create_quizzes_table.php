@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->string('question')->nullable();
-            $table->boolean('answer-bool')->nullable();
+            $table->boolean('answer')->nullable();
         });
     }
 

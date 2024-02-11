@@ -76,7 +76,7 @@
 
             // Aggiunge l'input appropriato in base alla selezione
             if (answertype === 'open') {
-                inputToShow.innerHTML = '<input class="form-control" type="text" name="answer-text" id="answer-text" required>';
+                inputToShow.innerHTML = '<input class="form-control" type="text" name="answer_text" id="answer-text" required>';
             } else if (answertype === 'close') {
                 inputToShow.innerHTML = '<label class="form-check-label" for="answer-bool-true">{{ __('True') }}</label>' +
                     '<input class="form-check-input" type="radio" name="answer" id="answer-bool-true" value="1" required> ' +

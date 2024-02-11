@@ -18,8 +18,7 @@ class Quiz extends Model
     protected $fillable = [
         'question',
         'answer',
-        'answer',
-        'answer-text',
+        'answer_text',
         'subject',
         'difficulty',
         'points',
