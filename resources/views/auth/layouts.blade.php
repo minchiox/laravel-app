@@ -33,6 +33,8 @@
                             <a href="{{ route('dashboard') }}" class="dropdown-item">Dashboard</a>
                             <a href="{{ route('user.profile') }}" class="dropdown-item">Profile</a>
                             <a href="{{ route('library.library') }}" class="dropdown-item">Make Library</a>
+                            <a href="{{ route('libraryquiz.index') }}" class="dropdown-item">Add Quiz to Library</a>
+                            <a href="{{ route('libraryquiz.list') }}" class="dropdown-item">show libraries</a>
                             @if(Auth::user()->isTeacher)
                                 <a href="{{ route('quiz.index') }}" class="dropdown-item">Quiz List</a>
                                 <a href="{{ route('quiz.create') }}" class="dropdown-item">Make Quiz</a>

@@ -26,6 +26,6 @@ class Quiz extends Model
 
     public function library()
     {
-        return $this->belongsToMany(Library::class);
+        return $this->belongsToMany(Library::class); //questo ritorna read id on null
     }
 }

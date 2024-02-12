@@ -47,5 +47,9 @@ Route::get('/library', [App\Http\Controllers\LibraryController::class, 'index'])
 Route::post('/library', [App\Http\Controllers\LibraryController::class, 'store'])->name('library.store');
 
 //rotte per gestione aggiunta di quiz ad una libreria
-Route::get('/library/{id}', [App\Http\Controllers\LibraryQuizController::class, 'addingQuiz'])->name('library.index');
-Route::post('/library/{id}', [App\Http\Controllers\LibraryQuizController::class, 'addQuizToLibrary'])->name('library.add');
+Route::get('/libraryquiz', [App\Http\Controllers\LibraryQuizController::class, 'index'])->name('libraryquiz.index');
+Route::post('/libraryquiz', [App\Http\Controllers\LibraryQuizController::class, 'store'])->name('libraryquiz.store'); // Cambiato da 'addQuiz' a 'store'
+Route::post('/libraryquiz/{library_id}/{quiz_id}', [App\Http\Controllers\LibraryQuizController::class, 'store'])->name('libraryquiz.addg');
+
+
+Route::get('/libraries', [App\Http\Controllers\LibraryQuizController::class, 'list'])->name('libraryquiz.list');//questa andrrebbe in libraryController in realtà

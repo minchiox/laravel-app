@@ -8,24 +8,32 @@ use App\Models\Quiz;
 
 class LibraryQuizController extends Controller
 {
-    public function addingQuiz(Library $library)
+    public function index(Library $library)
     {
-        $quiz= $library->quiz();
+        $quiz= $library->quiz()->get();
         $availableQuiz = Quiz::all();
+       $availableLibraries = Library::all();
 
-        return view ('library.index', compact('library', 'quiz', 'availableQuiz'));
+
+        return view('library.index', compact('library', 'quiz', 'availableQuiz','availableLibraries'));
     }
 
-    public function addQuizToLibrary(Request $request)
+    public function store(Request $request)
     {
-       $request->validate([
-           'id' => 'required',
-        ]);
+        $libraryId = $request->input('library_id');
+        $quizId = $request->input('quiz_id');
 
-        $library = $request->all();
+        // Esegui le operazioni per aggiungere il quiz alla libreria
+        // Ad esempio:
+        $library = Library::findOrFail($libraryId);
+        $library->quiz()->attach($quizId,['created_at' => now()]);
 
-        $library->quiz()->attach($request->id);
-
-        return view ('index', $library)->with('success', 'Quiz added successfully.');
+        // Reindirizza l'utente alla route desiderata con un messaggio di successo
+        return redirect()->route('libraryquiz.index')->with('success', 'Quiz aggiunto con successo alla libreria.');
+    }
+    public function list()
+    {
+        $availableLibraries = Library::all();
+        return view('library.list', compact('availableLibraries'));
     }
 }

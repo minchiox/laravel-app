@@ -19,6 +19,6 @@ class Library extends Model
 
     public function quiz()
     {
-        return $this->belongsToMany(Quiz::class);
+        return $this->belongsToMany(Quiz::class); //ritorna belongsToMany errore
     }
 }
