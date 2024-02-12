@@ -53,3 +53,12 @@ Route::post('/libraryquiz/{library_id}/{quiz_id}', [App\Http\Controllers\Library
 
 
 Route::get('/libraries', [App\Http\Controllers\LibraryQuizController::class, 'list'])->name('libraryquiz.list');//questa andrrebbe in libraryController in realtà
+//rotte per la gestione dei comandi Library List (delete, quiz, edit)
+Route::delete('/libraries/{id}', [App\Http\Controllers\LibraryController::class, 'destroy'])->name('library.destroy');
+Route::get('/libraries/{id}/edit', [App\Http\Controllers\LibraryController::class, 'edit'])->name('library.edit');
+Route::put('/libraries/{id}', [App\Http\Controllers\LibraryController::class, 'update'])->name('library.update');
+
+Route::get('/libraryquiz/{id}/quiz', [App\Http\Controllers\LibraryQuizController::class, 'quiz_list'])->name('library.quiz');
+Route::post('/libraryquiz/{id}/quiz', [App\Http\Controllers\LibraryQuizController::class, 'quiz_list'])->name('library.quiz');
+Route::delete('/libraryquiz/delete/{id}', [App\Http\Controllers\LibraryQuizController::class, 'quiz_destroy'])->name('library.quiz.destroy');
+

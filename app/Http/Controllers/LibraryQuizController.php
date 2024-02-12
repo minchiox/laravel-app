@@ -37,4 +37,28 @@ class LibraryQuizController extends Controller
         $availableLibraries = Library::all();
         return view('library.list', compact('availableLibraries'));
     }
+
+    public function quiz_list($libraryId)
+    {
+        //$quizzes = $library->quiz()->get();
+        $library = Library::find($libraryId);
+        $quizzes= $library->quiz()->get();
+
+        return view('library.quizlist', ['quizzes' => $quizzes]);
+    }
+
+    public function quiz_destroy($quizId)
+    {
+        $quizzes = Quiz::find($quizId);
+
+        // Retrieve the library ID before detaching the quiz
+        $libraryId = $quizzes->library()->first()->id;
+        $quizzes ->library()->detach();
+
+        $library = Library::with('quiz')->find($libraryId);
+        $quizzes = $library->quiz;
+
+        return view('library.quizlist', ['quizzes' => $quizzes]);
+    }
+
 }
