@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('library_quiz', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('library_id')->constrained();
-            $table->foreignId('quiz_id')->constrained();
+            $table->foreignId('library_id')->constrained()->onDelete('cascade');
+            $table->foreignId('quiz_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }

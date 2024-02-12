@@ -31,6 +31,7 @@ class LibraryQuizController extends Controller
         // Reindirizza l'utente alla route desiderata con un messaggio di successo
         return redirect()->route('libraryquiz.index')->with('success', 'Quiz aggiunto con successo alla libreria.');
     }
+
     public function list()
     {
         $availableLibraries = Library::all();
