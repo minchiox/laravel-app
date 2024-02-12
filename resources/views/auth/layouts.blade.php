@@ -39,28 +39,34 @@
                                 @csrf
                             </form>
                         </div>
-                    @if(Auth::user()->isTeacher)
+
                     <li class="nav-item dropdown">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle " href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
                             {{ __('Quiz') }}
                         </a>
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                             <a href="{{ route('quiz.index') }}" class="dropdown-item">Quiz List</a>
+                            @if(Auth::user()->isTeacher)
                             <a href="{{ route('quiz.create') }}" class="dropdown-item">Make Quiz</a>
+                            @endif
                         </div>
                     </li>
-                    @endif
+
+
 
                     <li class="nav-item dropdown">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle " href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
                             {{ __('Library') }}
                         </a>
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            @if(Auth::user()->isTeacher)
                             <a href="{{ route('library.library') }}" class="dropdown-item">Make Library</a>
                             <a href="{{ route('libraryquiz.index') }}" class="dropdown-item">Add Quiz to Library</a>
+                            @endif
                             <a href="{{ route('libraryquiz.list') }}" class="dropdown-item">Libraries List</a>
                         </div>
                     </li>
+
                 @endguest
             </ul>
         </div>

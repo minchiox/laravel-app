@@ -17,6 +17,7 @@
                         <tr>
                             <th scope="col">Name</th>
                             <th scope="col">Subject</th>
+                            <th scope="col">Difficulty</th>
                             <th scope="col">Created:</th>
                             <th scope="col">Actions:</th>
                         </tr>
@@ -26,16 +27,22 @@
                             <tr>
                                 <td>{{ $library->library_name }}</td>
                                 <td>{{ $library->library_subject }}</td>
+                                <td>{{ $library->library_difficulty }}</td>
                                 <td>{{ $library->created_at }}</td>
+
                                 <td>
                                     <a href="{{ route ('library.quiz', $library->id) }}" class="btn btn-primary">{{ __('Quiz') }}</a>
+                                    @if(Auth::user()->isTeacher)
                                     <a href="{{ route ('library.edit', $library->id) }}" class="btn btn-primary">{{ __('Edit') }}</a>
+
                                     <form action="{{ route('library.destroy', $library->id) }}" method="POST" style="display: inline;">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-danger">{{ __('Delete') }}</button>
                                     </form>
+                                    @endif
                                 </td>
+
                             </tr>
                         @endforeach
                         </tbody>

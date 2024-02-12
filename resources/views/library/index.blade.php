@@ -11,7 +11,11 @@
                             {{ session('success') }}
                         </div>
                     @endif
-
+                    @if (session('error'))
+                        <div class="alert alert-danger" role="alert">
+                            {{ session('error') }}
+                        </div>
+                    @endif
 
                     <div class="card-body">
                         <form method="POST" action="{{ route('libraryquiz.store') }}" enctype="multipart/form-data">

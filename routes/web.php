@@ -30,9 +30,9 @@ Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'index'])
 Route::post('/profile', [App\Http\Controllers\ProfileController::class, 'store'])->name('user.profile.store')->middleware('auth');
 
 //rotte quiz - Dove mostra i vari quiz e possono essere modificati o rimossi
-Route::get('/quizzes', [App\Http\Controllers\QuizController::class, 'list'])->name('quiz.list')->middleware(['auth', 'isTeacher']);
-Route::get('/quizzes', [App\Http\Controllers\QuizController::class, 'index'])->name('quiz.index')->middleware(['auth', 'isTeacher']);
-Route::get('/quizzes/search', [App\Http\Controllers\QuizController::class, 'search'])->name('quiz.search')->middleware(['auth', 'isTeacher']);
+Route::get('/quizzes', [App\Http\Controllers\QuizController::class, 'list'])->name('quiz.list')->middleware('auth');
+Route::get('/quizzes', [App\Http\Controllers\QuizController::class, 'index'])->name('quiz.index')->middleware('auth');
+Route::get('/quizzes/search', [App\Http\Controllers\QuizController::class, 'search'])->name('quiz.search')->middleware('auth');
 
 Route::delete('/quizzes/{id}', [App\Http\Controllers\QuizController::class, 'destroy'])->name('quiz.destroy')->middleware(['auth', 'isTeacher']);
 //rotte quiz - Creazione e store
@@ -42,20 +42,20 @@ Route::post('/quizzes', [App\Http\Controllers\QuizController::class, 'store'])->
 Route::get('/quizzes/{id}/edit', [App\Http\Controllers\QuizController::class, 'edit'])->name('quiz.edit')->middleware(['auth', 'isTeacher']);
 Route::put('/quizzes/{id}', [App\Http\Controllers\QuizController::class, 'update'])->name('quiz.update')->middleware(['auth', 'isTeacher']);
 
-//rotte gestione librerie
-Route::get('/library', [App\Http\Controllers\LibraryController::class, 'index'])->name('library.library');
-Route::post('/library', [App\Http\Controllers\LibraryController::class, 'store'])->name('library.store');
+//rotte gestione librerie->middleware(['auth', 'isTeacher'])
+Route::get('/library', [App\Http\Controllers\LibraryController::class, 'index'])->name('library.library')->middleware(['auth', 'isTeacher']);
+Route::post('/library', [App\Http\Controllers\LibraryController::class, 'store'])->name('library.store')->middleware(['auth', 'isTeacher']);
 
 //rotte per gestione aggiunta di quiz ad una libreria
-Route::get('/libraryquiz', [App\Http\Controllers\LibraryQuizController::class, 'index'])->name('libraryquiz.index');
-Route::post('/libraryquiz', [App\Http\Controllers\LibraryQuizController::class, 'store'])->name('libraryquiz.store'); // Cambiato da 'addQuiz' a 'store'
-Route::post('/libraryquiz/{library_id}/{quiz_id}', [App\Http\Controllers\LibraryQuizController::class, 'store'])->name('libraryquiz.addg');
+Route::get('/libraryquiz', [App\Http\Controllers\LibraryQuizController::class, 'index'])->name('libraryquiz.index')->middleware(['auth', 'isTeacher']);
+Route::post('/libraryquiz', [App\Http\Controllers\LibraryQuizController::class, 'store'])->name('libraryquiz.store')->middleware(['auth', 'isTeacher']); // Cambiato da 'addQuiz' a 'store'
+Route::post('/libraryquiz/{library_id}/{quiz_id}', [App\Http\Controllers\LibraryQuizController::class, 'store'])->name('libraryquiz.addg')->middleware(['auth', 'isTeacher']);
 
 
 Route::get('/libraries', [App\Http\Controllers\LibraryQuizController::class, 'list'])->name('libraryquiz.list');//questa andrrebbe in libraryController in realtà
 //rotte per la gestione dei comandi Library List (delete, quiz, edit)
-Route::delete('/libraries/{id}', [App\Http\Controllers\LibraryController::class, 'destroy'])->name('library.destroy');
-Route::get('/libraries/{id}/edit', [App\Http\Controllers\LibraryController::class, 'edit'])->name('library.edit');
+Route::delete('/libraries/{id}', [App\Http\Controllers\LibraryController::class, 'destroy'])->name('library.destroy')->middleware(['auth', 'isTeacher']);
+Route::get('/libraries/{id}/edit', [App\Http\Controllers\LibraryController::class, 'edit'])->name('library.edit')->middleware(['auth', 'isTeacher']);
 Route::put('/libraries/{id}', [App\Http\Controllers\LibraryController::class, 'update'])->name('library.update');
 
 Route::get('/libraryquiz/{id}/quiz', [App\Http\Controllers\LibraryQuizController::class, 'quiz_list'])->name('library.quiz');
