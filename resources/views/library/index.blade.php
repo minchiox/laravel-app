@@ -16,14 +16,14 @@
                     <div class="card-body">
                         <form method="POST" action="{{ route('libraryquiz.store') }}" enctype="multipart/form-data">
                             @csrf
-                            <label for="library_id">Libreria in cui aggiungere quiz:</label>
-                            <select name="library_id" id="library_id"> <!-- qui devo mettere $library->id tra 2 parentesi graffe -->
+                            <label class='form-label' for="library_id">Select Library:</label>
+                            <select class="form-select" name="library_id" id="library_id"> <!-- qui devo mettere $library->id tra 2 parentesi graffe -->
                                 @foreach($availableLibraries as $library)
                                     <option value="{{ $library->id }}">{{ $library->library_name }}</option>
                               @endforeach
                             </select><br>
-                            <label for="quiz_id">Aggiungi Quiz:</label>
-                            <select name="quiz_id" id="quiz_id">
+                            <label class='form-label' for="quiz_id">Select Quiz:</label>
+                            <select  class="form-select" name="quiz_id" id="quiz_id">
                                 @foreach($availableQuiz as $quiz)
                                     <option value="{{ $quiz->id }}">{{ $quiz->question }}</option> <!-- qui invece quiz sempre tra parentesi graffe -->
                                 @endforeach
@@ -31,7 +31,7 @@
 
                             <div class="row mb-3">
                                 <div class="col-md-12">
-                                    <button type="submit" class="btn btn-primary">{{ __('Aggiungi nuovo quiz') }}</button>
+                                    <button type="submit" class="btn btn-primary">{{ __('Add Quiz') }}</button>
                                 </div>
                             </div>
                         </form>

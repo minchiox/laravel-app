@@ -58,7 +58,7 @@
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                             <a href="{{ route('library.library') }}" class="dropdown-item">Make Library</a>
                             <a href="{{ route('libraryquiz.index') }}" class="dropdown-item">Add Quiz to Library</a>
-                            <a href="{{ route('libraryquiz.list') }}" class="dropdown-item">show libraries</a>
+                            <a href="{{ route('libraryquiz.list') }}" class="dropdown-item">Libraries List</a>
                         </div>
                     </li>
                 @endguest
