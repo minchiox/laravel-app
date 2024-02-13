@@ -26,10 +26,18 @@
                                     <option value="{{ $exam->id }}">{{ $exam->exam_name }}</option>
                                 @endforeach
                             </select><br>
+
+                            <label class='form-label' for="lib_id">Select Quiz:</label>
+                            <select  class="form-select" name="lib_id" id="lib_id">
+                                @foreach($availableLibraries as $lib)
+                                    <option value="{{ $lib->id }}">{{ $lib->library_name }}</option>
+                                @endforeach
+                            </select><br>
+
                             <label class='form-label' for="quiz_id">Select Quiz:</label>
                             <select  class="form-select" name="quiz_id" id="quiz_id">
                                 @foreach($availableQuiz as $quiz)
-                                    <option value="{{ $quiz->id }}">{{ $quiz->question }}</option>
+                                    <option value="">Seleziona un quiz</option>
                                 @endforeach
                             </select><br>
 
@@ -47,3 +55,42 @@
         </div>
     </div>
 @endsection
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var libSelect = document.getElementById('lib_id');
+        var quizSelect = document.getElementById('quiz_id');
+
+        // Add event listener to detect changes in the library select element
+        libSelect.addEventListener('change', function() {
+            var selectedLibId = this.value;
+            // Send an AJAX request to fetch quizzes associated with the selected library
+            axios.get('/libraries/' + selectedLibId + '/quizzes')
+                .then(function(response) {
+                    // Clear existing options
+                    var quizzes = response.data;
+                    // Ottieni il menu a discesa della quiz
+                    var quizSelect = document.getElementById('quiz_id');
+                    // Cancella tutte le opzioni esistenti nel menu a discesa della quiz
+                    quizSelect.innerHTML = '';
+                    // Aggiungi un'opzione predefinita al menu a discesa della quiz
+                    var defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.textContent = 'Seleziona una quiz';
+                    quizSelect.appendChild(defaultOption);
+                    // Aggiungi le nuove opzioni del menu a discesa della quiz
+                    // Populate the quiz select element with options based on the response
+                    response.data.forEach(function(quiz) {
+                        var option = document.createElement('option');
+                        option.value = quiz.id;
+                        option.textContent = quiz.question;
+                        quizSelect.appendChild(option);
+                    });
+                })
+                .catch(function(error) {
+                    console.error('Error fetching quizzes:', error);
+                });
+        });
+    });
+</script>
+

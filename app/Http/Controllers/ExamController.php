@@ -39,13 +39,13 @@ class ExamController extends Controller
         $exam->delete();
 
         // Reindirizza con un messaggio di successo
-        return redirect()->route('')->with('success', 'Exam deleted successfully.');
+        return redirect()->route('exam.list')->with('success', 'Exam deleted successfully.');
     }
 
     public function edit($id)
     {
         $exam = Exam::findOrFail($id);
-        return view('', compact('exam'));
+        return view('exam.edit', compact('exam'));
     }
 
     public function update(Request $request, $id)
@@ -63,7 +63,7 @@ class ExamController extends Controller
         $exam->update($input);
 
         // Reindirizza con un messaggio di successo
-        return redirect()->route('', $id)->with('success', 'Exam updated successfully.');
+        return redirect()->route('exam.edit', $id)->with('success', 'Exam updated successfully.');
     }
 
 }

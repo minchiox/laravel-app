@@ -65,4 +65,13 @@ class LibraryQuizController extends Controller
         return view('library.quizlist', ['quizzes' => $quizzes]);
     }
 
+    public function getQuizzes($libraryId)
+    {
+        // Fetch quizzes associated with the selected library
+        $library = Library::find($libraryId);
+        $quizzes = $library->quiz()->get();
+
+        return response()->json($quizzes);
+    }
+
 }

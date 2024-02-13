@@ -73,4 +73,13 @@ Route::get('/examquiz', [App\Http\Controllers\ExamQuizController::class, 'index'
 Route::post('/examquiz', [App\Http\Controllers\ExamQuizController::class, 'store'])->name('examquiz.store')->middleware(['auth', 'isTeacher']); // Cambiato da 'addQuiz' a 'store'
 //Route::post('/examquiz/{exam_id}/{quiz_id}', [App\Http\Controllers\ExamQuizController::class, 'storeg'])->name('examquiz.addg')->middleware(['auth', 'isTeacher']);
 
-
+//Rotte per la gestione delle action di exam
+Route::delete('/exams/{id}', [App\Http\Controllers\ExamController::class, 'destroy'])->name('exam.destroy');
+Route::get('/exams/{id}/edit', [App\Http\Controllers\ExamController::class, 'edit'])->name('exam.edit');
+Route::put('/exams/{id}', [App\Http\Controllers\ExamController::class, 'update'])->name('exam.update');
+//route action quiz for exam
+Route::get('/examquiz/{id}/quiz', [App\Http\Controllers\ExamQuizController::class, 'quiz_list'])->name('exam.quiz');
+Route::post('/examquiz/{id}/quiz', [App\Http\Controllers\ExamQuizController::class, 'quiz_list'])->name('exam.quiz');
+Route::delete('/examquiz/delete/{id}', [App\Http\Controllers\ExamQuizController::class, 'quiz_destroy'])->name('exam.quiz.destroy');
+//ROTTA PER PERMETTERE IL FETCH DEI QUIZ ALL'AJAX
+Route::get('/libraries/{id}/quizzes', [App\Http\Controllers\LibraryQuizController::class, 'getQuizzes'])->name('libraries.quiz.exam');

@@ -30,12 +30,35 @@ class ExamQuizController extends Controller
             $exam->quiz()->attach($quizId, ['created_at' => now()]);
 
             // Reindirizza l'utente alla route desiderata con un messaggio di successo
-            return redirect()->route('examquiz.index')->with('success', 'Quiz aggiunto con successo alla libreria.');
+            return redirect()->route('examquiz.index')->with('success', 'Quiz aggiunto con successo all esame.');
         } else {
             // Quiz già associato alla libreria, ritorna con un messaggio di errore
-            return redirect()->back()->with('error', 'Il quiz è già associato a questa libreria.');
+            return redirect()->back()->with('error', 'Il quiz è già associato a questo Esame.');
         }
     }
+
+    public function quiz_list($examId)
+    {
+        $exam = Exam::find($examId);
+        $quizzes= $exam->quiz()->get();
+
+        return view('exam.quizlist', ['quizzes' => $quizzes]);
+    }
+
+    public function quiz_destroy($quizId)
+    {
+        $quizzes = Quiz::find($quizId);
+
+        // Retrieve the library ID before detaching the quiz
+        $examId = $quizzes->exam()->first()->id;
+        $quizzes->exam()->detach();
+
+        $exam = Exam::with('quiz')->find($examId);
+        $quizzes = $exam->quiz;
+
+        return view('exam.quizlist', ['quizzes' => $quizzes]);
+    }
+
 
 
 

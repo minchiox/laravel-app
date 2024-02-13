@@ -1,14 +1,16 @@
+
 @extends('auth.layouts')
 @section('content')
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header">{{ __('Exam Maker') }}</div>
+                    <div class="card-header">{{ __('Exam Edit') }}</div>
 
                     <div class="card-body">
-                        <form method="POST" action="{{ route('exam.store') }}" enctype="multipart/form-data">
+                        <form method="POST" action="{{ route('exam.update', $exam->id) }}" enctype="multipart/form-data">
                             @csrf
+                            @method('PUT')
 
                             @if (session('success'))
                                 <div class="alert alert-success" role="alert">
@@ -18,16 +20,15 @@
 
                             <div class="row mb-3">
                                 <div class="col-md-12">
-                                    <label for="exam_name" class="form-label">{{ __('Exam') }}:</label>
-                                    <input class="form-control" type="text" id="exam_name" name="exam_name" autofocus required>
-                                    @error('question')
+                                    <label for="exam_name" class="form-label">{{ __('Name') }}:</label>
+                                    <input class="form-control" type="text" id="exam_name" name="exam_name" value="{{ $exam->exam_name }}" autofocus required>
+                                    @error('exam_name')
                                     <span role="alert" class="text-danger">
                                             <strong>{{ $message }}</strong>
                                         </span>
                                     @enderror
                                 </div>
                             </div>
-
 
                             <div class="row mb-3">
                                 <div class="col-md-12">
@@ -55,7 +56,7 @@
 
                             <div class="row mb-3">
                                 <div class="col-md-12">
-                                    <button type="submit" class="btn btn-primary">{{ __('Create new Exam') }}</button>
+                                    <button type="submit" class="btn btn-primary">{{ __('Edit Exam') }}</button>
                                 </div>
                             </div>
                         </form>
@@ -65,5 +66,5 @@
         </div>
     </div>
 
-
 @endsection
+
