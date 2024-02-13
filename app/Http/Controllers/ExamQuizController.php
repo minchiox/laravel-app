@@ -22,7 +22,6 @@ class ExamQuizController extends Controller
     {
         $request->all();
         $examId = $request->input('exam_id');
-        //$quizId = $request->input('quiz_id');
         $quizId = $request->input('quiz_id');
         $exam = Exam::findOrFail($examId);
         //$exam->quiz()->attach($quizId);
@@ -61,7 +60,16 @@ class ExamQuizController extends Controller
         return view('exam.quizlist', ['quizzes' => $quizzes]);
     }
 
-
+    public function access($examId)
+    {
+        $exam = Exam::find($examId);
+        $now = now();
+        if ($now < $exam->startAt || $now > $exam->dueAt) {
+            return redirect()->back()->with('error', 'L\'esame non è al momento disponibile.');
+        }
+        $quizzes = $exam->quiz()->get();
+        return view('exam.access', compact('quizzes','exam'));
+    }
 
 
 }

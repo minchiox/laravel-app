@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Exam;
 
@@ -14,6 +15,7 @@ class ExamController extends Controller
     public function list()
     {
         $availableExam = Exam::all();
+
         return view('exam.list', compact('availableExam'));
     }
 
@@ -65,5 +67,6 @@ class ExamController extends Controller
         // Reindirizza con un messaggio di successo
         return redirect()->route('exam.edit', $id)->with('success', 'Exam updated successfully.');
     }
+
 
 }

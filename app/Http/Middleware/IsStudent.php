@@ -18,7 +18,7 @@ class IsStudent
      */
     public function handle(Request $request, Closure $next)
     {
-        if (Auth::check() && !Auth::user()->isTeacher) {
+        if (auth()->check() && !auth()->user()->isTeacher) {
             return $next($request);
         }
 

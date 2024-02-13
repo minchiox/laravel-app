@@ -83,3 +83,5 @@ Route::post('/examquiz/{id}/quiz', [App\Http\Controllers\ExamQuizController::cla
 Route::delete('/examquiz/delete/{id}', [App\Http\Controllers\ExamQuizController::class, 'quiz_destroy'])->name('exam.quiz.destroy');
 //ROTTA PER PERMETTERE IL FETCH DEI QUIZ ALL'AJAX
 Route::get('/libraries/{id}/quizzes', [App\Http\Controllers\LibraryQuizController::class, 'getQuizzes'])->name('libraries.quiz.exam');
+
+Route::get('/exam/{id}', [App\Http\Controllers\ExamQuizController::class, 'access'])->name('exam.access')->middleware('auth');

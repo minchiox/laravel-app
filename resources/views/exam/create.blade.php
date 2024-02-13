@@ -44,7 +44,7 @@
                             <div class="row mb-3">
                                 <div class="col-md-12">
                                     <label for="exam_end" class="form-label">Select Date and Time:{{ __('End time') }}:</label>
-                                    <input type="datetime-local" id="datetime" name="dueAt" autofocus required>
+                                    <input type="datetime-local" id="datetime" step="3600" name="dueAt" autofocus required>
                                     @error('dueAt')
                                     <span role="alert" class="text-danger">
                                             <strong>{{ $message }}</strong>

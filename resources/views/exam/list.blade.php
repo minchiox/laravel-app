@@ -11,7 +11,11 @@
                             {{ session('success') }}
                         </div>
                     @endif
-
+                        @if (session('error'))
+                            <div class="alert alert-danger" role="alert">
+                                {{ session('error') }}
+                            </div>
+                        @endif
                     <table class="table">
                         <thead>
                         <tr>
@@ -31,17 +35,19 @@
                                 <td>{{ $exam->total_points }}</td>
 
                                 <td>
-                                    <a href="{{ route ('exam.quiz', $exam->id) }}" class="btn btn-primary">{{ __('Quiz') }}</a>
                                     @if(Auth::user()->isTeacher)
+                                    <a href="{{ route ('exam.quiz', $exam->id) }}" class="btn btn-primary">{{ __('Quiz') }}</a>
                                         <a href="{{ route ('exam.edit', $exam->id) }}" class="btn btn-primary">{{ __('Edit') }}</a>
                                         <form action="{{ route('exam.destroy', $exam->id) }}" method="POST" style="display: inline;">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger">{{ __('Delete') }}</button>
                                         </form>
+
+
+                                        <a href="{{ route('exam.access', $exam->id) }}" class="btn btn-primary">{{ __('Join') }}</a>
                                     @endif
                                 </td>
-
                             </tr>
                         @endforeach
                         </tbody>

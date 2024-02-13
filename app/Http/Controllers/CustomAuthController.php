@@ -61,7 +61,7 @@ class CustomAuthController extends Controller
         if (Auth::check()) {
             return view('auth.dashboard');
         }
-        return redirect("login")->withSuccess('You are not allowed to access');
+        return redirect("login")->withSuccess('You are not allowed to access.blade.php');
     }
     public function signOut()
     {
