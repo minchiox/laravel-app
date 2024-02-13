@@ -20,21 +20,15 @@ class ExamQuizController extends Controller
 
     public function store(Request $request)
     {
+        $request->all();
         $examId = $request->input('exam_id');
+        //$quizId = $request->input('quiz_id');
         $quizId = $request->input('quiz_id');
-
         $exam = Exam::findOrFail($examId);
+        $exam->quiz()->attach($quizId);
 
-        // Verifica se il quiz è già associato all'esame
-        if (!$exam->quiz()->where('quiz_id', $quizId)->exists()) {
-            $exam->quiz()->attach($quizId, ['created_at' => now()]);
+        return redirect()->route('examquiz.index')->with('success', 'Quiz aggiunto con successo all esame.');
 
-            // Reindirizza l'utente alla route desiderata con un messaggio di successo
-            return redirect()->route('examquiz.index')->with('success', 'Quiz aggiunto con successo all esame.');
-        } else {
-            // Quiz già associato alla libreria, ritorna con un messaggio di errore
-            return redirect()->back()->with('error', 'Il quiz è già associato a questo Esame.');
-        }
     }
 
     public function quiz_list($examId)
