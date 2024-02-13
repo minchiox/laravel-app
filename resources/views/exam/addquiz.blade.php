@@ -64,14 +64,11 @@
     document.addEventListener('DOMContentLoaded', function() {
         var libSelect = document.getElementById('lib_id');
 
-        // Add event listener to detect changes in the library select element
-        libSelect.addEventListener('change', function() {
-            var selectedLibId = this.value;
-            // Send an AJAX request to fetch quizzes associated with the selected library
-            axios.get('/libraries/' + selectedLibId + '/quizzes')
+        // Function to fetch quizzes based on selected library
+        function fetchQuizzes(libraryId) {
+            axios.get('/libraries/' + libraryId + '/quizzes')
                 .then(function(response) {
                     console.log(response.data);
-                    console.log(tableBody);
                     var quizzes = response.data;
                     var tableBody = document.querySelector('#quiz_table tbody');
                     // Cancella tutte le righe esistenti nella tabella tranne l'intestazione
@@ -105,20 +102,19 @@
                         // Aggiungi la cella per le azioni (ad esempio, pulsante di eliminazione)
                         var actionsCell = document.createElement('td');
                         var addButton = document.createElement('button');
-                       addButton.textContent = 'Add';
+                        addButton.textContent = 'Add';
                         addButton.classList.add('btn', 'btn-primary');
                         // Assegna un gestore di eventi per gestire la cancellazione del quiz
-                      addButton.addEventListener('click', function() {
-                          var form = document.getElementById('formexam');
+                        addButton.addEventListener('click', function() {
+                            var form = document.getElementById('formexam');
 
-                          var quizIdInput = document.createElement('input');
-                          quizIdInput.type = 'hidden';
-                          quizIdInput.name = 'quiz_id'; // Assicurati che il nome del campo corrisponda a quello atteso dalla route
-                          quizIdInput.value = quiz.id;
-                          form.appendChild(quizIdInput);
+                            var quizIdInput = document.createElement('input');
+                            quizIdInput.type = 'hidden';
+                            quizIdInput.name = 'quiz_id'; // Assicurati che il nome del campo corrisponda a quello atteso dalla route
+                            quizIdInput.value = quiz.id;
+                            form.appendChild(quizIdInput);
 
-
-                          form.submit();
+                            form.submit();
                         });
                         actionsCell.appendChild(addButton);
                         row.appendChild(actionsCell);
@@ -130,7 +126,17 @@
                 .catch(function(error) {
                     console.error('Error fetching quizzes:', error);
                 });
+        }
+
+        // Fetch quizzes based on the initially selected library when the page loads
+        var selectedLibId = libSelect.value;
+        fetchQuizzes(selectedLibId);
+
+        // Add event listener to detect changes in the library select element
+        libSelect.addEventListener('change', function() {
+            var selectedLibId = this.value;
+            // Fetch quizzes based on the selected library when the selection changes
+            fetchQuizzes(selectedLibId);
         });
     });
 </script>
-
