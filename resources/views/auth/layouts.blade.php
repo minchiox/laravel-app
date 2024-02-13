@@ -66,7 +66,19 @@
                             <a href="{{ route('libraryquiz.list') }}" class="dropdown-item">Libraries List</a>
                         </div>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a id="navbarDropdown" class="nav-link dropdown-toggle " href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
+                            {{ __('Exam') }}
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            @if(Auth::user()->isTeacher)
+                                <a href="{{ route('exam.store') }}" class="dropdown-item">Make Exam</a>
+                            @endif
+                                <a href="{{ route('examquiz.store') }}" class="dropdown-item">Add Quiz to Exam</a>
 
+                            <a href="{{ route('exam.list') }}" class="dropdown-item">Exam List</a>
+                        </div>
+                    </li>
                 @endguest
             </ul>
         </div>

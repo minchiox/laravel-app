@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->string('exam_name');
-            $table->integer('total_points');
+            $table->integer('total_points')->nullable();
             $table->dateTime("dueAt");
             $table->dateTime("startAt");
         });

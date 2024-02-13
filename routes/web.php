@@ -62,3 +62,15 @@ Route::get('/libraryquiz/{id}/quiz', [App\Http\Controllers\LibraryQuizController
 Route::post('/libraryquiz/{id}/quiz', [App\Http\Controllers\LibraryQuizController::class, 'quiz_list'])->name('library.quiz');
 Route::delete('/libraryquiz/delete/{id}', [App\Http\Controllers\LibraryQuizController::class, 'quiz_destroy'])->name('library.quiz.destroy');
 
+//rotte per gli esami
+Route::get('/exams', [App\Http\Controllers\ExamController::class, 'list'])->name('exam.list');//questa andrrebbe in libraryController in realtà
+
+Route::post('/createExam', [App\Http\Controllers\ExamController::class, 'store'])->name('exam.store')->middleware(['auth', 'isTeacher']);
+Route::get('/createExam', [App\Http\Controllers\ExamController::class, 'index'])->name('exam.index')->middleware(['auth', 'isTeacher']);
+
+//rotte per gestione aggiunta di quiz ad un esame
+Route::get('/examquiz', [App\Http\Controllers\ExamQuizController::class, 'index'])->name('examquiz.index')->middleware(['auth', 'isTeacher']);
+Route::post('/examquiz', [App\Http\Controllers\ExamQuizController::class, 'store'])->name('examquiz.store')->middleware(['auth', 'isTeacher']); // Cambiato da 'addQuiz' a 'store'
+//Route::post('/examquiz/{exam_id}/{quiz_id}', [App\Http\Controllers\ExamQuizController::class, 'storeg'])->name('examquiz.addg')->middleware(['auth', 'isTeacher']);
+
+

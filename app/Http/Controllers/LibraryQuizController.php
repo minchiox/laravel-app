@@ -37,7 +37,6 @@ class LibraryQuizController extends Controller
         }
     }
 
-
     public function list()
     {
         $availableLibraries = Library::all();

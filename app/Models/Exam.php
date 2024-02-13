@@ -12,9 +12,9 @@ class Exam extends Model
     protected $fillable = [
         'id',
         'exam_name',
-        'exam_totalpoints',
-        'exam_dueAt',
-        'exam_startAt',
+        'totalpoints',
+        'dueAt',
+        'startAt',
     ];
 
     public function quiz()
