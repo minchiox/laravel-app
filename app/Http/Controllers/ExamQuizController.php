@@ -8,6 +8,8 @@ use App\Models\Exam;
 use App\Models\Quiz;
 use App\Models\Library;
 use App\Models\UserAnswer;
+use App\Models\User;
+
 class ExamQuizController extends Controller
 {
     public function index(Exam $exam)
@@ -86,6 +88,8 @@ class ExamQuizController extends Controller
 
     public function storeUserAnswers(Request $request)
     {
+        $examid = $request->input('exam_id');
+
         $quizzes = Quiz::all();
         foreach ($quizzes as $quiz) {
             $quizId = $quiz->id;
@@ -110,11 +114,38 @@ class ExamQuizController extends Controller
             $userAnswer->quiz_id = $quizId;
             $userAnswer->answer = $answer;
             $userAnswer->answer_text = $answer_text;
+            $userAnswer->exam_id = $examid;
             $userAnswer->save();
         }
 
         return view('auth.dashboard')->with('success', 'L\'esame è stato consegnato correttamente.');
     }
+
+    public function indexingResults($examId)
+    {
+        $exam = Exam::find($examId);
+        $users= $exam->user()->get();
+
+        return view('exam.results', compact('exam','users'));
+    }
+
+    public function displayUsersAnswer($userId, $examId){
+
+        $exam = Exam::find($examId);
+        $quizzes = $exam->quiz()->get()->pluck('id');
+
+        $userAnswer = UserAnswer::where('user_id', $userId)
+            ->whereIn('quiz_id', $quizzes)
+            ->where('exam_id', $examId)
+            ->get();
+
+        $quizzes = $exam->quiz()->get();
+
+        return view('exam.resultsuser', compact('userAnswer', 'quizzes'));
+
+    }
+
+
 
 
 }

@@ -16,6 +16,7 @@ class UserAnswer extends Model
         'answer',
         'answer_text',
         'points',
+        'exam_id',
     ];
 
     public function quiz()
@@ -26,5 +27,10 @@ class UserAnswer extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function exam()
+    {
+        return $this->belongsTo(Exam::class);
     }
 }

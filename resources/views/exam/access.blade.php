@@ -17,7 +17,8 @@
                         </div>
                     @endif
                         <form id="form_user_answer" method="POST" action="{{ route('store.user.answer') }}" enctype="multipart/form-data">
-                                @foreach ($quizzes as $quiz)
+                            <input class="form-control" type="hidden" name="exam_id" id="exam_id" value="{{ $exam->id }}">
+                        @foreach ($quizzes as $quiz)
                                     <div class="card mb-3">
                                         <div class="card-body">
                                             <h5 class="card-title">{{ $quiz->question }}</h5>

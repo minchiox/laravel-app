@@ -43,10 +43,9 @@
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger">{{ __('Delete') }}</button>
                                         </form>
-
-
-                                        <a href="{{ route('exam.access', $exam->id) }}" class="btn btn-primary">{{ __('Join') }}</a>
                                     @endif
+                                        <a href="{{ route('exam.access', $exam->id) }}" class="btn btn-primary">{{ __('Join') }}</a>
+                                        <a href="{{ route('show.users.results.index', $exam->id) }}" class="btn btn-primary">{{ __('Results') }}</a>
                                 </td>
                             </tr>
                         @endforeach
