@@ -90,3 +90,4 @@ Route::post('/exam/sendAnswer', [App\Http\Controllers\ExamQuizController::class,
 Route::get('/exam/results/{id}', [App\Http\Controllers\ExamQuizController::class, 'indexingResults'])->name('show.users.results.index');
 
 Route::get('/exam/results/user/{iduser}/{idexam}', [App\Http\Controllers\ExamQuizController::class, 'displayUsersAnswer'])->name('display.users.answer');
+

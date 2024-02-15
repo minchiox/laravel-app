@@ -141,7 +141,23 @@ class ExamQuizController extends Controller
 
         $quizzes = $exam->quiz()->get();
 
-        return view('exam.resultsuser', compact('userAnswer', 'quizzes'));
+        return view('exam.resultsuser', compact('userAnswer', 'quizzes', 'exam'));
+
+    }
+
+    public function correctAnswer(Request $request){
+
+        $examId = $request->input('exam_id');
+        $exam = Exam::find($examId);
+        $quizzes = $exam->quiz()->get();
+
+        $userId = $request->input('user_id');
+
+        //get all user answer response
+
+
+
+        return view('auth.dashboard')->with('success', 'L\'esame è stato consegnato correttamente.');
 
     }
 
