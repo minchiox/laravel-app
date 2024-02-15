@@ -5,26 +5,26 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Exam extends Model
+class UserAnswer extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'id',
-        'exam_name',
-        'totalpoints',
-        'dueAt',
-        'startAt',
+        'quiz_id',
+        'user_id',
+        'answer',
+        'answer_text',
+        'points',
     ];
 
     public function quiz()
     {
-        return $this->belongsToMany(Quiz::class, );
+        return $this->belongsTo(Quiz::class);
     }
 
     public function user()
     {
-        return $this->belongsToMany(User::class, );
+        return $this->belongsTo(User::class);
     }
-
 }

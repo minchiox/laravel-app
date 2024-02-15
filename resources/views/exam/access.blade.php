@@ -16,30 +16,32 @@
                             {{ session('error') }}
                         </div>
                     @endif
+                        <form id="form_user_answer" method="POST" action="{{ route('store.user.answer') }}" enctype="multipart/form-data">
+                                @foreach ($quizzes as $quiz)
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ $quiz->question }}</h5>
+                                            @if($quiz->answer_text == null)
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="answer{{ $quiz->id }}" id="answer-bool-true{{ $quiz->id }}" value="1" required checked>
+                                                    <label class="form-check-label" for="answer-bool-true{{ $quiz->id }}">{{ __('True') }}</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="answer{{ $quiz->id }}" id="answer-bool-false{{ $quiz->id }}" value="0" required>
+                                                    <label class="form-check-label" for="answer-bool-false{{ $quiz->id }}">{{ __('False') }}</label>
+                                                </div>
+                                            @else
+                                                <div class="form-group">
+                                                    <input class="form-control" type="text" name="answer_text{{ $quiz->id }}" id="answer-text{{ $quiz->id }}" value="{{ old('answer_text' . $quiz->id, '') }}" required>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
 
-                    @foreach ($quizzes as $quiz)
-                        <div class="card mb-3">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ $quiz->question }}</h5>
-                                @if($quiz->answer_text == null)
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="answer{{ $quiz->id }}" id="answer-bool-true{{ $quiz->id }}" value="1" required>
-                                        <label class="form-check-label" for="answer-bool-true{{ $quiz->id }}">{{ __('True') }}</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="answer{{ $quiz->id }}" id="answer-bool-false{{ $quiz->id }}" value="0" required>
-                                        <label class="form-check-label" for="answer-bool-false{{ $quiz->id }}">{{ __('False') }}</label>
-                                    </div>
-                                @else
-                                    <div class="form-group">
-                                        <input class="form-control" type="text" name="answer_text{{ $quiz->id }}" id="answer-text{{ $quiz->id }}" required>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-                    @endforeach
-
-                    <button type="submit" class="btn btn-primary align-items-center">{{ __('Submit') }}</button>
+                                    @csrf
+                            <button type="submit" class="btn btn-primary align-items-center">{{ __('Submit') }}</button>
+                        </form>
 
                 </div>
             </div>

@@ -85,3 +85,4 @@ Route::delete('/examquiz/delete/{id}', [App\Http\Controllers\ExamQuizController:
 Route::get('/libraries/{id}/quizzes', [App\Http\Controllers\LibraryQuizController::class, 'getQuizzes'])->name('libraries.quiz.exam');
 
 Route::get('/exam/{id}', [App\Http\Controllers\ExamQuizController::class, 'access'])->name('exam.access')->middleware('auth');
+Route::post('/exam/sendAnswer', [App\Http\Controllers\ExamQuizController::class, 'storeUserAnswers'])->name('store.user.answer');

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Exam;
 use App\Models\Quiz;
 use App\Models\Library;
+use App\Models\UserAnswer;
 class ExamQuizController extends Controller
 {
     public function index(Exam $exam)
@@ -68,7 +70,41 @@ class ExamQuizController extends Controller
             return redirect()->back()->with('error', 'L\'esame non è al momento disponibile.');
         }
         $quizzes = $exam->quiz()->get();
+        $user = Auth::user();
+        $exam->user()->attach($user->id);
         return view('exam.access', compact('quizzes','exam'));
+    }
+
+    public function storeUserAnswers(Request $request)
+    {
+        $quizzes = Quiz::all();
+        foreach ($quizzes as $quiz) {
+            $quizId = $quiz->id;
+
+            // Check if the answer is submitted as a radio button or a text input
+            if ($request->has('answer' . $quizId)) {
+                // If it's a radio button answer
+                $answer = $request->input('answer' . $quizId);
+                $answer_text=null;
+            } elseif ($request->has('answer_text' . $quizId)) {
+                // If it's a text input answer
+                $answer_text = $request->input('answer_text' . $quizId);
+                $answer = null;
+            } else {
+                // Handle the case if no answer is submitted for the quiz
+                continue; // Skip this quiz and move to the next one
+            }
+
+            // Now you have the $quizId and $answer, you can save them to the database
+            $userAnswer = new UserAnswer();
+            $userAnswer->user_id = auth()->id();
+            $userAnswer->quiz_id = $quizId;
+            $userAnswer->answer = $answer;
+            $userAnswer->answer_text = $answer_text;
+            $userAnswer->save();
+        }
+
+        return view('auth.dashboard')->with('success', 'L\'esame è stato consegnato correttamente.');
     }
 
 
