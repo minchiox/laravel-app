@@ -29,6 +29,9 @@ class ExamQuizController extends Controller
         //$exam->quiz()->attach($quizId);
         if (!$exam->quiz()->where('quiz_id', $quizId)->exists()) {
             $exam->quiz()->attach($quizId, ['created_at' => now()]);
+            $totalPoints = $exam->quiz()->sum('points');
+            $exam->total_points = $totalPoints;
+            $exam->save();
 
             // Reindirizza l'utente alla route desiderata con un messaggio di successo
             return redirect()->route('examquiz.index')->with('success', 'Quiz aggiunto con successo all\'esame.');
@@ -69,8 +72,14 @@ class ExamQuizController extends Controller
         if ($now < $exam->startAt || $now > $exam->dueAt) {
             return redirect()->back()->with('error', 'L\'esame non è al momento disponibile.');
         }
-        $quizzes = $exam->quiz()->get();
+
         $user = Auth::user();
+        if ($exam->user()->where('user_id', $user->id)->exists()) {
+            return redirect()->back()->with('error', 'Hai già partecipato a questo esame.');
+        }
+
+        $quizzes = $exam->quiz()->get();
+
         $exam->user()->attach($user->id);
         return view('exam.access', compact('quizzes','exam'));
     }
