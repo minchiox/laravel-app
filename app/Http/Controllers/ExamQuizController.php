@@ -9,6 +9,7 @@ use App\Models\Quiz;
 use App\Models\Library;
 use App\Models\UserAnswer;
 use App\Models\User;
+use PDF;
 
 class ExamQuizController extends Controller
 {
@@ -165,7 +166,7 @@ class ExamQuizController extends Controller
             if ($quiz && isset($quiz->points)) {
 
                 // Controlla se la risposta dello studente è corretta confrontandola con la risposta corretta del quiz
-                if ($studentAnswer->answer == $quiz->answer && $quiz->answer != null) {
+                if ($studentAnswer->answer == $quiz->answer && $quiz->answer !== null) {
                     // Aggiorna il punteggio per questa risposta
                     $studentAnswer->points = $quiz->points;
                     $studentAnswer->save();
@@ -193,6 +194,39 @@ class ExamQuizController extends Controller
         return view('exam.list', compact('availableExam'))->with('success', 'L\'esame è stato correttamente valutato.');
     }
 
+
+
+    public function printExam($examId)
+    {
+        // Recupera l'esame dal database
+        $exam = Exam::find($examId);
+
+        // Controlla se l'esame esiste
+        if (!$exam) {
+            return back()->with('error', "L'esame non è stato trovato");
+        }
+
+        // Recupera le domande dell'esame
+        //$quizzes = $exam->quizzes;
+        $quizzes = $exam->quiz()->get();
+        // Genera il nome del file PDF
+        $filename = 'exam_' . $examId . '.pdf';
+
+        // Crea il documento PDF utilizzando la libreria Laravel PDF
+        $pdf = PDF::loadView('exam.pdf', compact('exam', 'quizzes'));
+
+        // Opzionalmente, puoi personalizzare l'output del PDF
+        // $pdf->setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif']);
+
+        // Salva il PDF sul server
+        $pdf->save(public_path('pdf/' . $filename));
+
+        // Oppure, per visualizzare il PDF nel browser, puoi utilizzare il metodo stream
+        // return $pdf->stream($filename);
+
+        // Ora puoi ritornare alla pagina precedente con un messaggio di successo
+        return back()->with('success', "Esame correttamente esportato in PDF");
+    }
 
 
 
