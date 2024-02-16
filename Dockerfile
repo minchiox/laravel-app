@@ -53,6 +53,12 @@ COPY --chown=www:www . /var/www
 # Change current user to www
 USER www
 
+# Run composer install to install dependencies
+RUN composer install
+
+# Install laravel-dompdf and laravel/ui packages
+RUN composer require barryvdh/laravel-dompdf laravel/ui
+
 # Expose port 9000 and start php-fpm server
 EXPOSE 9000
 CMD ["php-fpm"]
