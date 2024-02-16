@@ -16,9 +16,9 @@
                             {{ session('error') }}
                         </div>
                     @endif
-                    <form id="form_user_answer" method="POST" action="{{ route('#') }}" enctype="multipart/form-data">
+                    <form id="form_user_answer" method="POST" action="{{ route('display.users.answerP') }}" enctype="multipart/form-data">
                         <input class="form-control" type="hidden" name="exam_id" id="exam_id" value="{{ $exam->id }}">
-                        <input class="form-control" type="hidden" name="user_id" id="user_id" value="{{ $user->id }}">
+                        <input class="form-control" type="hidden" name="user_id" id="user_id" value="{{ $userId }}">
                         @foreach ($quizzes as $quiz)
                             <div class="card mb-3">
                                 <div class="card-body">

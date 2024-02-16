@@ -141,25 +141,59 @@ class ExamQuizController extends Controller
 
         $quizzes = $exam->quiz()->get();
 
-        return view('exam.resultsuser', compact('userAnswer', 'quizzes', 'exam'));
+        return view('exam.resultsuser', compact('userAnswer', 'quizzes', 'exam','userId'));
 
     }
 
-    public function correctAnswer(Request $request){
-
+    public function correctAnswer(Request $request)
+    {
         $examId = $request->input('exam_id');
-        $exam = Exam::find($examId);
-        $quizzes = $exam->quiz()->get();
-
         $userId = $request->input('user_id');
 
-        //get all user answer response
+        // Ottieni le risposte degli studenti per l'esame specificato dall'utente
+        $studentAnswers = UserAnswer::where('exam_id', $examId)->where('user_id', $userId)->get();
 
+        // Inizializza il punteggio totale dello studente a 0
+        $totalScore = 0;
 
+        // Itera attraverso le risposte degli studenti e aggiorna il punteggio per ogni risposta
+        foreach ($studentAnswers as $studentAnswer) {
+            // Ottieni il quiz associato alla risposta dello studente
+            $quiz = Quiz::find($studentAnswer->quiz_id);
 
-        return view('auth.dashboard')->with('success', 'L\'esame è stato consegnato correttamente.');
+            // Assicurati che il quiz sia stato trovato e che abbia un punteggio
+            if ($quiz && isset($quiz->points)) {
 
+                // Controlla se la risposta dello studente è corretta confrontandola con la risposta corretta del quiz
+                if ($studentAnswer->answer == $quiz->answer && $quiz->answer != null) {
+                    // Aggiorna il punteggio per questa risposta
+                    $studentAnswer->points = $quiz->points;
+                    $studentAnswer->save();
+
+                    // Aggiungi il punteggio di questa risposta al punteggio totale dello studente
+                    $totalScore += $quiz->points;
+                }
+
+                if ($studentAnswer->answer_text == $quiz->answer_text && $quiz->answer_text != null) {
+                    // Aggiorna il punteggio per questa risposta
+                    $studentAnswer->points = $quiz->points;
+                    $studentAnswer->save();
+
+                    // Aggiungi il punteggio di questa risposta al punteggio totale dello studente
+                    $totalScore += $quiz->points;
+                }
+            }
+        }
+
+        // Aggiorna lo score totale dell'utente nella tabella exam_user
+        \DB::table('exam_user')->where('exam_id', $examId)->where('user_id', $userId)->update(['user_points' => $totalScore]);
+
+        // Restituisci la vista con un messaggio di successo
+        $availableExam = Exam::all();
+        return view('exam.list', compact('availableExam'))->with('success', 'L\'esame è stato correttamente valutato.');
     }
+
+
 
 
 

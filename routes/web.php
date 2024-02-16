@@ -91,3 +91,5 @@ Route::get('/exam/results/{id}', [App\Http\Controllers\ExamQuizController::class
 
 Route::get('/exam/results/user/{iduser}/{idexam}', [App\Http\Controllers\ExamQuizController::class, 'displayUsersAnswer'])->name('display.users.answer');
 
+Route::get('/examcorrect', [App\Http\Controllers\ExamQuizController::class, 'correctAnswer'])->name('display.users.answerF');
+Route::post('/examcorrect', [App\Http\Controllers\ExamQuizController::class, 'correctAnswer'])->name('display.users.answerP');
