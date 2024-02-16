@@ -83,7 +83,7 @@ class ExamQuizController extends Controller
             return redirect()->back()->with('error', 'Hai già partecipato a questo esame.');
         }
 
-        $quizzes = $exam->quiz()->get();
+        $quizzes = $exam->quiz()->inRandomOrder()->get();
 
         $exam->user()->attach($user->id);
         return view('exam.access', compact('quizzes','exam'));
@@ -244,7 +244,7 @@ class ExamQuizController extends Controller
             return back()->with('error', "L'esame non è stato trovato");
         }
         // Recupera le domande dell'esame
-        $quizzes = $exam->quiz()->get();
+        $quizzes = $exam->quiz()->inRandomOrder()->get();
         // Genera il nome del file PDF
         $filename = 'blankexam_' . $examId . '.pdf';
 

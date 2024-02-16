@@ -96,4 +96,4 @@ Route::post('/examcorrect', [App\Http\Controllers\ExamQuizController::class, 'co
 
 Route::post('/printexam/{idexam}/{iduser}', [App\Http\Controllers\ExamQuizController::class, 'printExamUser'])->name('print.exam');
 
-Route::post('/printexam/{idexam}', [App\Http\Controllers\ExamQuizController::class, 'printExam'])->name('print.blankexam');
+Route::get('/printexam/{idexam}', [App\Http\Controllers\ExamQuizController::class, 'printExam'])->name('print.blankexam');
