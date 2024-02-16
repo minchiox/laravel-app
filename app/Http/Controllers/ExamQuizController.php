@@ -198,19 +198,20 @@ class ExamQuizController extends Controller
 
 
 
-    public function printExam($examId, $userId)
+    public function printExamUser($examId, $userId)
     {
         // Recupera l'esame dal database
         $exam = Exam::find($examId);
         $userAnswer = UserAnswer::where('user_id', $userId)
             ->where('exam_id', $examId)
             ->get();
-
+        $user = User::find($userId);
         // Controlla se l'esame esiste
         if (!$exam) {
             return back()->with('error', "L'esame non è stato trovato");
         }
-
+        //per stampare il nome dello studente che ha svolto l'esame
+        $user = $user->name;
         // Recupera le domande dell'esame
         //$quizzes = $exam->quizzes;
         $quizzes = $exam->quiz()->get();
@@ -218,7 +219,7 @@ class ExamQuizController extends Controller
         $filename = 'exam_' . $examId . '.pdf';
 
         // Crea il documento PDF utilizzando la libreria Laravel PDF
-        $pdf = PDF::loadView('exam.printResult', compact('exam', 'quizzes', 'userId', 'userAnswer'));
+        $pdf = PDF::loadView('exam.printResult', compact('exam', 'quizzes', 'userId', 'userAnswer','user'));
 
         // Opzionalmente, puoi personalizzare l'output del PDF
         // $pdf->setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif']);
@@ -233,6 +234,35 @@ class ExamQuizController extends Controller
         return back()->with('success', "Esame correttamente esportato in PDF");
     }
 
+    public function printExam($examId)
+    {
+        // Recupera l'esame dal database
+        $exam = Exam::find($examId);
+
+        // Controlla se l'esame esiste
+        if (!$exam) {
+            return back()->with('error', "L'esame non è stato trovato");
+        }
+        // Recupera le domande dell'esame
+        $quizzes = $exam->quiz()->get();
+        // Genera il nome del file PDF
+        $filename = 'blankexam_' . $examId . '.pdf';
+
+        // Crea il documento PDF utilizzando la libreria Laravel PDF
+        $pdf = PDF::loadView('exam.printResultBlank', compact('exam', 'quizzes'));
+
+        // Opzionalmente, puoi personalizzare l'output del PDF
+        // $pdf->setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif']);
+
+        // Salva il PDF sul server
+        $pdf->save(public_path('pdf/' . $filename));
+
+        // Oppure, per visualizzare il PDF nel browser, puoi utilizzare il metodo stream
+        // return $pdf->stream($filename);
+
+        // Ora puoi ritornare alla pagina precedente con un messaggio di successo
+        return back()->with('success', "Esame correttamente esportato in PDF");
+    }
 
 
 
