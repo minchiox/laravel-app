@@ -30,7 +30,7 @@
                                 <td>
                                     @if(Auth::user()->isTeacher)
                                         <a href="{{ route ('display.users.answer', [ 'iduser' => $user->id, 'idexam' => $exam->id]) }}" class="btn btn-primary">{{ __('Result') }}</a>
-                                    <form id="form_user_answer" method="POST" action="{{ route('print.exam',['idexam' => $exam->id]) }}" enctype="multipart/form-data">
+                                    <form id="form_user_answer" method="POST" action="{{ route('print.exam',['idexam' => $exam->id, 'iduser' => $user->id]) }}" enctype="multipart/form-data">
                                         @csrf
                                         <button type="submit" class="btn btn-primary align-items-center">{{ __('Print') }}</button>
                                     </form>

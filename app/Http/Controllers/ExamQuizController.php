@@ -10,6 +10,8 @@ use App\Models\Library;
 use App\Models\UserAnswer;
 use App\Models\User;
 use PDF;
+use Illuminate\Support\Facades\Storage;
+
 
 class ExamQuizController extends Controller
 {
@@ -196,10 +198,13 @@ class ExamQuizController extends Controller
 
 
 
-    public function printExam($examId)
+    public function printExam($examId, $userId)
     {
         // Recupera l'esame dal database
         $exam = Exam::find($examId);
+        $userAnswer = UserAnswer::where('user_id', $userId)
+            ->where('exam_id', $examId)
+            ->get();
 
         // Controlla se l'esame esiste
         if (!$exam) {
@@ -213,7 +218,7 @@ class ExamQuizController extends Controller
         $filename = 'exam_' . $examId . '.pdf';
 
         // Crea il documento PDF utilizzando la libreria Laravel PDF
-        $pdf = PDF::loadView('exam.pdf', compact('exam', 'quizzes'));
+        $pdf = PDF::loadView('exam.printResult', compact('exam', 'quizzes', 'userId', 'userAnswer'));
 
         // Opzionalmente, puoi personalizzare l'output del PDF
         // $pdf->setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif']);
