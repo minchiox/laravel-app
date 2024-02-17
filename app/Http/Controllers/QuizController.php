@@ -7,36 +7,11 @@ use App\Models\Quiz;
 
 class QuizController extends Controller
 {
-    /*public function index()
-    {
-        $quizzes = Quiz::all();
-        return view('quiz.quiz');
-    }*/
     public function create()
     {
         return view('quiz.quiz');
     }
-    public function index(Request $request)
-    {
-        $query = Quiz::query();
 
-        // Applica i filtri di ricerca
-        if ($request->filled('question')) {
-            $query->where('question', 'like', '%' . $request->input('question') . '%');
-        }
-
-        if ($request->filled('difficulty')) {
-            $query->where('difficulty', $request->input('difficulty'));
-        }
-
-        if ($request->filled('subject')) {
-            $query->where('subject', 'like', '%' . $request->input('subject') . '%');
-        }
-
-        $quizzes = $query->get();
-
-        return view('quiz.index', compact('quizzes'));
-    }
     public function search(Request $request)
     {
         $query = Quiz::query();
@@ -119,7 +94,7 @@ class QuizController extends Controller
         $quiz->delete();
 
         // Reindirizza con un messaggio di successo
-        return redirect()->route('quiz.index')->with('success', 'Quiz deleted successfully.');
+        return redirect()->route('quiz.list')->with('success', 'Quiz deleted successfully.');
     }
 
 }

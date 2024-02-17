@@ -69,38 +69,7 @@ class CustomAuthController extends Controller
         Auth::logout();
         return Redirect('login');
     }
-    /*public function showLoginForm()
-    {
-        if (Auth::check()) {
-            return redirect()->route('dashboard');
-        }
 
-        return view('auth.login');
-    }
-    public function showRegisterForm()
-    {
-        if (Auth::check()) {
-            return redirect()->route('dashboard');
-        }
-
-        return view('auth.register');
-    }
-    public function showHome()
-    {
-        if (Auth::check()) {
-            return redirect()->route('dashboard');
-        }
-
-        return view('welcome');
-    }
-    public function showHome2()
-    {
-        if (Auth::check()) {
-            return view('auth.dashboard'); // Renderizza la vista 'home' se l'utente è autenticato
-        } else {
-            return redirect()->route('login'); // Reindirizza all pagina di login se l'utente non è autenticato
-        }
-    }*/
 }
 
 

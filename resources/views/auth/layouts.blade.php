@@ -15,17 +15,17 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="navbar-brand">
-                    <img  src="{{ asset('logo/Mexamlogo.png') }}" height='50'  alt="Logo">
+                        <img src="{{ asset('logo/Mexamlogo.png') }}" height="50" alt="Logo Mexam" style="cursor: pointer;">
                 </li>
                 @guest
-                    <li class="nav-item">
+                    <li class="nav-item mt-2">
                         <a class="nav-link" href="{{ route('login') }}">Login</a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item mt-2">
                         <a class="nav-link" href="{{ route('register') }}">Register</a>
                     </li>
                 @else
-                    <li class="nav-item dropdown">
+                    <li class="nav-item dropdown mt-2">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle " href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
                             <img src="/avatars/{{ Auth::user()->avatar }}" style="width: 30px; border-radius: 10%">
                             {{ Auth::user()->name }}
@@ -42,12 +42,12 @@
                             </form>
                         </div>
 
-                    <li class="nav-item dropdown">
+                    <li class="nav-item dropdown mt-2">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle " href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
                             {{ __('Quiz') }}
                         </a>
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <a href="{{ route('quiz.index') }}" class="dropdown-item">Quiz List</a>
+                            <a href="{{ route('quiz.list') }}" class="dropdown-item">Quiz List</a>
                             @if(Auth::user()->isTeacher)
                             <a href="{{ route('quiz.create') }}" class="dropdown-item">Make Quiz</a>
                             @endif
@@ -56,7 +56,7 @@
 
 
 
-                    <li class="nav-item dropdown">
+                    <li class="nav-item dropdown mt-2">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle " href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
                             {{ __('Library') }}
                         </a>
@@ -68,7 +68,7 @@
                             <a href="{{ route('libraryquiz.list') }}" class="dropdown-item">Libraries List</a>
                         </div>
                     </li>
-                    <li class="nav-item dropdown">
+                    <li class="nav-item dropdown mt-2">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle " href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
                             {{ __('Exam') }}
                         </a>

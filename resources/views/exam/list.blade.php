@@ -46,7 +46,7 @@
                                     @endif
                                         <a href="{{ route('exam.access', $exam->id) }}" class="btn btn-primary">{{ __('Join') }}</a>
                                         <a href="{{ route('show.users.results.index', $exam->id) }}" class="btn btn-primary">{{ __('Results') }}</a>
-                                        <a href="{{ route('print.blankexam', $exam->id) }}" class="btn btn-primary">{{ __('Print') }}</a>
+                                        <a href="{{ route('print.blankexam', $exam->id) }}" target="_blank" class="btn btn-primary">{{ __('Print') }}</a>
                                 </td>
                             </tr>
                         @endforeach

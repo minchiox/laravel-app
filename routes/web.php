@@ -14,7 +14,11 @@ use App\Http\Controllers\CustomAuthController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    if (!auth()->check()) {
+        return view('welcome');
+    } else {
+        return redirect()->route('dashboard');
+    }
 });
 
 Route::get('dashboard', [CustomAuthController::class, 'dashboard'])->name('dashboard')->middleware('auth');;
@@ -31,7 +35,6 @@ Route::post('/profile', [App\Http\Controllers\ProfileController::class, 'store']
 
 //rotte quiz - Dove mostra i vari quiz e possono essere modificati o rimossi
 Route::get('/quizzes', [App\Http\Controllers\QuizController::class, 'list'])->name('quiz.list')->middleware('auth');
-Route::get('/quizzes', [App\Http\Controllers\QuizController::class, 'index'])->name('quiz.index')->middleware('auth');
 Route::get('/quizzes/search', [App\Http\Controllers\QuizController::class, 'search'])->name('quiz.search')->middleware('auth');
 
 Route::delete('/quizzes/{id}', [App\Http\Controllers\QuizController::class, 'destroy'])->name('quiz.destroy')->middleware(['auth', 'isTeacher']);
@@ -56,11 +59,11 @@ Route::get('/libraries', [App\Http\Controllers\LibraryQuizController::class, 'li
 //rotte per la gestione dei comandi Library List (delete, quiz, edit)
 Route::delete('/libraries/{id}', [App\Http\Controllers\LibraryController::class, 'destroy'])->name('library.destroy')->middleware(['auth', 'isTeacher']);
 Route::get('/libraries/{id}/edit', [App\Http\Controllers\LibraryController::class, 'edit'])->name('library.edit')->middleware(['auth', 'isTeacher']);
-Route::put('/libraries/{id}', [App\Http\Controllers\LibraryController::class, 'update'])->name('library.update');
+Route::put('/libraries/{id}', [App\Http\Controllers\LibraryController::class, 'update'])->name('library.update')->middleware('auth');;
 
-Route::get('/libraryquiz/{id}/quiz', [App\Http\Controllers\LibraryQuizController::class, 'quiz_list'])->name('library.quiz');
-Route::post('/libraryquiz/{id}/quiz', [App\Http\Controllers\LibraryQuizController::class, 'quiz_list'])->name('library.quiz');
-Route::delete('/libraryquiz/delete/{id}', [App\Http\Controllers\LibraryQuizController::class, 'quiz_destroy'])->name('library.quiz.destroy');
+Route::get('/libraryquiz/{id}/quiz', [App\Http\Controllers\LibraryQuizController::class, 'quiz_list'])->name('library.quiz')->middleware('auth');;
+Route::post('/libraryquiz/{id}/quiz', [App\Http\Controllers\LibraryQuizController::class, 'quiz_list'])->name('library.quiz')->middleware('auth');;
+Route::delete('/libraryquiz/delete/{id}', [App\Http\Controllers\LibraryQuizController::class, 'quiz_destroy'])->name('library.quiz.destroy')->middleware('auth');;
 
 //rotte per gli esami
 Route::get('/exams', [App\Http\Controllers\ExamController::class, 'list'])->name('exam.list');//questa andrrebbe in libraryController in realtà
@@ -74,26 +77,26 @@ Route::post('/examquiz', [App\Http\Controllers\ExamQuizController::class, 'store
 //Route::post('/examquiz/{exam_id}/{quiz_id}', [App\Http\Controllers\ExamQuizController::class, 'storeg'])->name('examquiz.addg')->middleware(['auth', 'isTeacher']);
 
 //Rotte per la gestione delle action di exam
-Route::delete('/exams/{id}', [App\Http\Controllers\ExamController::class, 'destroy'])->name('exam.destroy');
-Route::get('/exams/{id}/edit', [App\Http\Controllers\ExamController::class, 'edit'])->name('exam.edit');
-Route::put('/exams/{id}', [App\Http\Controllers\ExamController::class, 'update'])->name('exam.update');
+Route::delete('/exams/{id}', [App\Http\Controllers\ExamController::class, 'destroy'])->name('exam.destroy')->middleware('auth');;
+Route::get('/exams/{id}/edit', [App\Http\Controllers\ExamController::class, 'edit'])->name('exam.edit')->middleware('auth');;
+Route::put('/exams/{id}', [App\Http\Controllers\ExamController::class, 'update'])->name('exam.update')->middleware('auth');;
 //route action quiz for exam
-Route::get('/examquiz/{id}/quiz', [App\Http\Controllers\ExamQuizController::class, 'quiz_list'])->name('exam.quiz');
-Route::post('/examquiz/{id}/quiz', [App\Http\Controllers\ExamQuizController::class, 'quiz_list'])->name('exam.quiz');
-Route::delete('/examquiz/delete/{id}', [App\Http\Controllers\ExamQuizController::class, 'quiz_destroy'])->name('exam.quiz.destroy');
+Route::get('/examquiz/{id}/quiz', [App\Http\Controllers\ExamQuizController::class, 'quiz_list'])->name('exam.quiz')->middleware('auth');;
+Route::post('/examquiz/{id}/quiz', [App\Http\Controllers\ExamQuizController::class, 'quiz_list'])->name('exam.quiz')->middleware('auth');;
+Route::delete('/examquiz/delete/{id}', [App\Http\Controllers\ExamQuizController::class, 'quiz_destroy'])->name('exam.quiz.destroy')->middleware('auth');;
 //ROTTA PER PERMETTERE IL FETCH DEI QUIZ ALL'AJAX
-Route::get('/libraries/{id}/quizzes', [App\Http\Controllers\LibraryQuizController::class, 'getQuizzes'])->name('libraries.quiz.exam');
+Route::get('/libraries/{id}/quizzes', [App\Http\Controllers\LibraryQuizController::class, 'getQuizzes'])->name('libraries.quiz.exam')->middleware('auth');;
 
 Route::get('/exam/{id}', [App\Http\Controllers\ExamQuizController::class, 'access'])->name('exam.access')->middleware('auth');
-Route::post('/exam/sendAnswer', [App\Http\Controllers\ExamQuizController::class, 'storeUserAnswers'])->name('store.user.answer');
+Route::post('/exam/sendAnswer', [App\Http\Controllers\ExamQuizController::class, 'storeUserAnswers'])->name('store.user.answer')->middleware('auth');;
 
-Route::get('/exam/results/{id}', [App\Http\Controllers\ExamQuizController::class, 'indexingResults'])->name('show.users.results.index');
+Route::get('/exam/results/{id}', [App\Http\Controllers\ExamQuizController::class, 'indexingResults'])->name('show.users.results.index')->middleware('auth');;
 
-Route::get('/exam/results/user/{iduser}/{idexam}', [App\Http\Controllers\ExamQuizController::class, 'displayUsersAnswer'])->name('display.users.answer');
+Route::get('/exam/results/user/{iduser}/{idexam}', [App\Http\Controllers\ExamQuizController::class, 'displayUsersAnswer'])->name('display.users.answer')->middleware('auth');;
 
-Route::get('/examcorrect', [App\Http\Controllers\ExamQuizController::class, 'correctAnswer'])->name('display.users.answerF');
-Route::post('/examcorrect', [App\Http\Controllers\ExamQuizController::class, 'correctAnswer'])->name('display.users.answerP');
+Route::get('/examcorrect', [App\Http\Controllers\ExamQuizController::class, 'correctAnswer'])->name('display.users.answerF')->middleware('auth');;
+Route::post('/examcorrect', [App\Http\Controllers\ExamQuizController::class, 'correctAnswer'])->name('display.users.answerP')->middleware('auth');;
 
-Route::post('/printexam/{idexam}/{iduser}', [App\Http\Controllers\ExamQuizController::class, 'printExamUser'])->name('print.exam');
+Route::get('/printexam/{idexam}/{iduser}', [App\Http\Controllers\ExamQuizController::class, 'printExamUser'])->name('print.exam')->middleware('auth');;
 
-Route::get('/printexam/{idexam}', [App\Http\Controllers\ExamQuizController::class, 'printExam'])->name('print.blankexam');
+Route::get('/printexam/{idexam}', [App\Http\Controllers\ExamQuizController::class, 'printExam'])->name('print.blankexam')->middleware('auth');;

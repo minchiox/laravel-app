@@ -227,11 +227,13 @@ class ExamQuizController extends Controller
         // Salva il PDF sul server
         $pdf->save(public_path('pdf/' . $filename));
 
-        // Oppure, per visualizzare il PDF nel browser, puoi utilizzare il metodo stream
-        // return $pdf->stream($filename);
+        // Ritorna la risposta HTTP con il PDF allegato
+        $response = response($pdf->output())
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'inline; filename="' . $filename . '"');
 
-        // Ora puoi ritornare alla pagina precedente con un messaggio di successo
-        return back()->with('success', "Esame correttamente esportato in PDF");
+        // Ritorna alla pagina precedente con un messaggio di successo
+        return response($pdf->output())->header('Content-Type', 'application/pdf')->header('Content-Disposition', 'inline; filename="' . $filename . '"');
     }
 
     public function printExam($examId)
@@ -257,14 +259,14 @@ class ExamQuizController extends Controller
         // Salva il PDF sul server
         $pdf->save(public_path('pdf/' . $filename));
 
-        // Oppure, per visualizzare il PDF nel browser, puoi utilizzare il metodo stream
-        // return $pdf->stream($filename);
+        // Ritorna la risposta HTTP con il PDF allegato
+        $response = response($pdf->output())
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'inline; filename="' . $filename . '"');
 
-        // Ora puoi ritornare alla pagina precedente con un messaggio di successo
-        return back()->with('success', "Esame correttamente esportato in PDF");
+        // Ritorna alla pagina precedente con un messaggio di successo
+        return response($pdf->output())->header('Content-Type', 'application/pdf')->header('Content-Disposition', 'inline; filename="' . $filename . '"');
     }
-
-
 
 
 }

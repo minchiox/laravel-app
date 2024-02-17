@@ -22,12 +22,12 @@
                                     <h5 class="card-title">{{ $quiz->question }}</h5>
                                     @if($quiz->answer_text == null)
                                         <div class="form-check">
-                                            <input class="" type="radio" name="answer{{ $quiz->id }}" id="answer-bool-true{{ $quiz->id }}" value="1" required >
-                                            <label class="" for="answer-bool-true{{ $quiz->id }}">{{ __('True') }}</label>
+                                            <input class="form-check-input" type="radio" name="answer{{ $quiz->id }}" id="answer-bool-true{{ $quiz->id }}" value="1" required >
+                                            <label class="form-check-label" for="answer-bool-true{{ $quiz->id }}">{{ __('True') }}</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="" type="radio" name="answer{{ $quiz->id }}" id="answer-bool-false{{ $quiz->id }}" value="0" required>
-                                            <label class="" for="answer-bool-false{{ $quiz->id }}">{{ __('False') }}</label>
+                                            <input class="form-check-input" type="radio" name="answer{{ $quiz->id }}" id="answer-bool-false{{ $quiz->id }}" value="0" required>
+                                            <label class="form-check-label" for="answer-bool-false{{ $quiz->id }}">{{ __('False') }}</label>
                                         </div>
                                     @else
                                         <div class="form-group">
