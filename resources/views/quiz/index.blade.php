@@ -61,12 +61,14 @@
                             <td>{{ $quiz->points }}</td>
                             <td>{{ $quiz->created_at }}</td>
                             <td>
+                                @if(Auth::user()->isTeacher)
                                 <a href="{{ route('quiz.edit', $quiz->id) }}" class="btn btn-primary">{{ __('Edit') }}</a>
                                 <form action="{{ route('quiz.destroy', $quiz->id) }}" method="POST" style="display: inline;">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger">Elimina</button>
                                 </form>
+                                @endif
                             </td>
                         </tr>
                     @endforeach

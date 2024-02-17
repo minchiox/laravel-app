@@ -75,9 +75,8 @@
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                             @if(Auth::user()->isTeacher)
                                 <a href="{{ route('exam.store') }}" class="dropdown-item">Make Exam</a>
-                            @endif
                                 <a href="{{ route('examquiz.store') }}" class="dropdown-item">Add Quiz to Exam</a>
-
+                            @endif
                             <a href="{{ route('exam.list') }}" class="dropdown-item">Exam List</a>
                         </div>
                     </li>
