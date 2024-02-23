@@ -38,15 +38,19 @@
                                     @if(Auth::user()->isTeacher)
                                     <a href="{{ route ('exam.quiz', $exam->id) }}" class="btn btn-primary">{{ __('Quiz') }}</a>
                                         <a href="{{ route ('exam.edit', $exam->id) }}" class="btn btn-primary">{{ __('Edit') }}</a>
+                                        <a href="{{ route('print.blankexam', $exam->id) }}" target="_blank" class="btn btn-primary">{{ __('Print') }}</a>
+                                        <a href="{{ route('show.users.results.index', $exam->id) }}" class="btn btn-primary">{{ __('Results') }}</a>
                                         <form action="{{ route('exam.destroy', $exam->id) }}" method="POST" style="display: inline;">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger">{{ __('Delete') }}</button>
                                         </form>
                                     @endif
-                                        <a href="{{ route('exam.access', $exam->id) }}" class="btn btn-primary">{{ __('Join') }}</a>
-                                        <a href="{{ route('show.users.results.index', $exam->id) }}" class="btn btn-primary">{{ __('Results') }}</a>
-                                        <a href="{{ route('print.blankexam', $exam->id) }}" target="_blank" class="btn btn-primary">{{ __('Print') }}</a>
+                                    @if(!Auth::user()->isTeacher)
+                                    <a href="{{ route('exam.access', $exam->id) }}" class="btn btn-primary">{{ __('Join') }}</a>
+                                    @endif
+
+
                                 </td>
                             </tr>
                         @endforeach
