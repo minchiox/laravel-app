@@ -20,3 +20,11 @@ yarn-error.log
 
 # Marker scritto dall'entrypoint Docker dopo il primo seed
 /storage/.mexam-seeded
+
+# Contenuti degli utenti: avatar caricati e PDF generati.
+# Erano committati, quindi il repo conteneva avatar di persone reali e i PDF
+# di esami effettivamente svolti.
+/public/avatars/*
+!/public/avatars/.gitignore
+/public/pdf/*
+!/public/pdf/.gitignore

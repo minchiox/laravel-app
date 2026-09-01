@@ -28,22 +28,22 @@ class ProfileController extends Controller
             'avatar' => 'image',
         ]);
 
-        $input = $request->all();
+        // $request->all() lasciava passare qualunque campo presente nel POST:
+        // con isTeacher fra i $fillable, uno studente si promuoveva docente
+        // aggiungendo un input al form. Qui si accetta solo cio' che il profilo
+        // puo' davvero modificare.
+        $input = $request->only(['name', 'email', 'phone', 'city']);
 
         if ($request->hasFile('avatar')) {
-            $avatarName = time().'.'.$request->avatar->getClientOriginalExtension();
+            // time() come nome collideva fra due upload nello stesso secondo
+            $avatarName = uniqid('avatar_', true).'.'.$request->avatar->getClientOriginalExtension();
             $request->avatar->move(public_path('avatars'), $avatarName);
 
             $input['avatar'] = $avatarName;
-
-        } else {
-            unset($input['avatar']);
         }
 
         if ($request->filled('password')) {
-            $input['password'] = Hash::make($input['password']);
-        } else {
-            unset($input['password']);
+            $input['password'] = Hash::make($request->input('password'));
         }
 
         auth()->user()->update($input);

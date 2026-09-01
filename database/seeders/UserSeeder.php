@@ -33,14 +33,21 @@ class UserSeeder extends Seeder
      */
     private function user(string $email, string $name, bool $isTeacher): User
     {
-        return User::updateOrCreate(
+        $user = User::updateOrCreate(
             ['email' => $email],
             [
                 'name' => $name,
                 'password' => Hash::make(self::PASSWORD),
-                'isTeacher' => $isTeacher,
                 'email_verified_at' => now(),
             ],
         );
+
+        // isTeacher e' fuori dal mass assignment (era la via con cui uno
+        // studente si promuoveva docente dal profilo), quindi va assegnato a
+        // parte: updateOrCreate lo scarterebbe in silenzio.
+        $user->isTeacher = $isTeacher;
+        $user->save();
+
+        return $user;
     }
 }

@@ -212,28 +212,18 @@ class ExamQuizController extends Controller
         }
         //per stampare il nome dello studente che ha svolto l'esame
         $user = $user->name;
-        // Recupera le domande dell'esame
-        //$quizzes = $exam->quizzes;
         $quizzes = $exam->quiz()->get();
-        // Genera il nome del file PDF
-        $filename = 'exam_' . $examId . '.pdf';
 
-        // Crea il documento PDF utilizzando la libreria Laravel PDF
-        $pdf = PDF::loadView('exam.printResult', compact('exam', 'quizzes', 'userId', 'userAnswer','user'));
+        // Il nome includeva solo l'id dell'esame, quindi il compito di uno
+        // studente sovrascriveva quello di un altro.
+        $filename = "esame_{$examId}_studente_{$userId}.pdf";
 
-        // Opzionalmente, puoi personalizzare l'output del PDF
-        // $pdf->setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif']);
+        $pdf = PDF::loadView('exam.printResult', compact('exam', 'quizzes', 'userId', 'userAnswer', 'user'));
 
-        // Salva il PDF sul server
-        $pdf->save(public_path('pdf/' . $filename));
-
-        // Ritorna la risposta HTTP con il PDF allegato
-        $response = response($pdf->output())
-            ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'inline; filename="' . $filename . '"');
-
-        // Ritorna alla pagina precedente con un messaggio di successo
-        return response($pdf->output())->header('Content-Type', 'application/pdf')->header('Content-Disposition', 'inline; filename="' . $filename . '"');
+        // Il PDF veniva salvato in public/pdf/ con un nome prevedibile: i
+        // compiti svolti erano scaricabili da chiunque, senza autenticazione.
+        // Ora viene solo trasmesso al docente che lo ha richiesto.
+        return $pdf->stream($filename);
     }
 
     public function printExam($examId)
@@ -245,27 +235,14 @@ class ExamQuizController extends Controller
         if (!$exam) {
             return back()->with('error', "L'esame non è stato trovato");
         }
-        // Recupera le domande dell'esame
         $quizzes = $exam->quiz()->inRandomOrder()->get();
-        // Genera il nome del file PDF
-        $filename = 'blankexam_' . $examId . '.pdf';
+        $filename = "esame_{$examId}_in_bianco.pdf";
 
-        // Crea il documento PDF utilizzando la libreria Laravel PDF
         $pdf = PDF::loadView('exam.printResultBlank', compact('exam', 'quizzes'));
 
-        // Opzionalmente, puoi personalizzare l'output del PDF
-        // $pdf->setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif']);
-
-        // Salva il PDF sul server
-        $pdf->save(public_path('pdf/' . $filename));
-
-        // Ritorna la risposta HTTP con il PDF allegato
-        $response = response($pdf->output())
-            ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'inline; filename="' . $filename . '"');
-
-        // Ritorna alla pagina precedente con un messaggio di successo
-        return response($pdf->output())->header('Content-Type', 'application/pdf')->header('Content-Disposition', 'inline; filename="' . $filename . '"');
+        // Anche qui il salvataggio in public/ rendeva le tracce d'esame
+        // scaricabili in anticipo da chiunque conoscesse l'id.
+        return $pdf->stream($filename);
     }
 
 

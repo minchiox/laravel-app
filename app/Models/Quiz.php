@@ -24,9 +24,28 @@ class Quiz extends Model
         'points',
     ];
 
+    /**
+     * `answer` e `answer_text` sono le risposte corrette: non devono finire in
+     * nessuna serializzazione JSON. L'endpoint /libraries/{id}/quizzes le
+     * restituiva a qualunque utente autenticato, studenti compresi.
+     *
+     * Non influisce sull'accesso via proprieta' ($quiz->answer) usato dalle
+     * view del docente e dalla correzione.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'answer',
+        'answer_text',
+    ];
+
+    protected $casts = [
+        'answer' => 'boolean',
+    ];
+
     public function library()
     {
-        return $this->belongsToMany(Library::class); //questo ritorna read id on null
+        return $this->belongsToMany(Library::class);
     }
 
     public function exam()

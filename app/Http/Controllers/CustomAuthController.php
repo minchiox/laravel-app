@@ -38,8 +38,10 @@ class CustomAuthController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
         ]);
-        $data = $request->all();
-        $data['isTeacher'] = $request->has('isTeacher');
+        // Il ruolo non arriva piu' dal form: chiunque poteva registrarsi come
+        // docente spuntando una checkbox. Si assegna con
+        // `php artisan mexam:make-teacher <email>`.
+        $data = $request->only(['name', 'email', 'password']);
         $this->create($data);
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
@@ -53,7 +55,6 @@ class CustomAuthController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'isTeacher' => $data['isTeacher']
         ]);
     }
     public function dashboard()
