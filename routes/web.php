@@ -38,9 +38,14 @@ Route::get('/', function () {
 */
 Route::middleware('guest')->group(function () {
     Route::get('login', [CustomAuthController::class, 'index'])->name('login');
-    Route::post('custom-login', [CustomAuthController::class, 'customLogin'])->name('login.custom');
     Route::get('register', [CustomAuthController::class, 'registration'])->name('register');
-    Route::post('custom-registration', [CustomAuthController::class, 'customRegistration'])->name('register.custom');
+
+    // Non c'era alcun rate limiting: le credenziali erano attaccabili a forza
+    // bruta senza limiti.
+    Route::middleware('throttle:5,1')->group(function () {
+        Route::post('custom-login', [CustomAuthController::class, 'customLogin'])->name('login.custom');
+        Route::post('custom-registration', [CustomAuthController::class, 'customRegistration'])->name('register.custom');
+    });
 });
 
 /*
