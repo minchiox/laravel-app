@@ -20,7 +20,7 @@ class FlashMessageTest extends TestCase
     public function test_il_messaggio_di_conferma_viene_mostrato_dal_layout_condiviso(): void
     {
         $docente = User::factory()->teacher()->create();
-        $quiz = Quiz::factory()->create();
+        $quiz = Quiz::factory()->create(['user_id' => $docente->id]);
 
         $response = $this->actingAs($docente)->delete(route('quiz.destroy', $quiz->id));
 

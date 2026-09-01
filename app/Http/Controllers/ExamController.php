@@ -23,6 +23,10 @@ class ExamController extends Controller
     {
         $exam = new Exam();
         $exam->fill($request->validated());
+        // Il proprietario si assegna qui, mai da input: e' quello che rende
+        // possibile distinguere in seguito il materiale di un docente da
+        // quello di un altro.
+        $exam->user_id = auth()->id();
         $exam->save();
 
         return back()->with('success', 'Exam added successfully.');
@@ -31,6 +35,7 @@ class ExamController extends Controller
     public function destroy($id)
     {
         $exam = Exam::findOrFail($id);
+        $this->authorize('delete', $exam);
         $exam->delete();
 
         // Reindirizza con un messaggio di successo
@@ -40,12 +45,15 @@ class ExamController extends Controller
     public function edit($id)
     {
         $exam = Exam::findOrFail($id);
+        $this->authorize('update', $exam);
+
         return view('exam.edit', compact('exam'));
     }
 
     public function update(UpdateExamRequest $request, $id)
     {
         $exam = Exam::findOrFail($id);
+        $this->authorize('update', $exam);
         $exam->update($request->validated());
 
         // Reindirizza con un messaggio di successo

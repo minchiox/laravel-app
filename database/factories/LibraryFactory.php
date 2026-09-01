@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -15,6 +16,7 @@ class LibraryFactory extends Factory
         $difficulty = $this->faker->randomElement(QuizFactory::DIFFICULTIES);
 
         return [
+            'user_id' => User::factory()->teacher(),
             // era fake()->name(), cioe' il nome di una persona come nome di una
             // libreria di quiz
             'library_name' => "{$subject} · livello {$difficulty}",

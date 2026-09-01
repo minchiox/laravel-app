@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,6 +17,7 @@ class ExamFactory extends Factory
         return [
             // era fake()->name(): il nome di una persona come nome di un esame
             'exam_name' => "Verifica di {$subject}",
+            'user_id' => User::factory()->teacher(),
             ...$this->openState(),
         ];
     }

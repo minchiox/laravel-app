@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class CustomAuthController extends Controller
 {
@@ -49,7 +50,9 @@ class CustomAuthController extends Controller
         $request->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:6',
+            // min:6 senza altri vincoli era piu' debole della politica usata
+            // sul cambio password dal profilo: le due vanno allineate.
+            'password' => ['required', Password::min(8)],
         ]);
 
         // Il ruolo non arriva piu' dal form: chiunque poteva registrarsi come

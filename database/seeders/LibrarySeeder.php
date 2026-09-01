@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Library;
 use App\Models\Quiz;
+use App\Models\User;
 use Database\Factories\QuizFactory;
 use Illuminate\Database\Seeder;
 
@@ -15,8 +16,10 @@ class LibrarySeeder extends Seeder
 {
     public function run(): void
     {
+        $docenteId = User::where('email', UserSeeder::TEACHER_EMAIL)->value('id');
+
         foreach (QuizFactory::SUBJECTS as $subject) {
-            $library = Library::factory()->subject($subject)->create();
+            $library = Library::factory()->subject($subject)->create(['user_id' => $docenteId]);
 
             $quizIds = Quiz::where('subject', $subject)->pluck('id');
 

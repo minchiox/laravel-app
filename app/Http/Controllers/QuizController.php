@@ -16,7 +16,10 @@ class QuizController extends Controller
 
     public function search(Request $request)
     {
-        $query = Quiz::query();
+        // Solo i quiz del docente che cerca: la colonna "Answer" della view
+        // e' la risposta corretta, non e' materiale da poter sfogliare tra
+        // docenti diversi.
+        $query = Quiz::where('user_id', auth()->id());
 
         // Applica i filtri di ricerca
         if ($request->filled('question')) {
@@ -37,13 +40,15 @@ class QuizController extends Controller
     }
     public function list()
     {
-        $quizzes = Quiz::all();
+        $quizzes = Quiz::where('user_id', auth()->id())->get();
+
         return view('quiz.index', ['quizzes' => $quizzes]);
     }
     public function store(StoreQuizRequest $request)
     {
         $quiz = new Quiz();
         $quiz->fill($this->normalizeAnswer($request->validated()));
+        $quiz->user_id = auth()->id();
         $quiz->save();
 
         return back()->with('success', 'Quiz added successfully.');
@@ -52,12 +57,15 @@ class QuizController extends Controller
     public function edit($id)
     {
         $quiz = Quiz::findOrFail($id);
+        $this->authorize('update', $quiz);
+
         return view('quiz.edit', compact('quiz'));
     }
 
     public function update(UpdateQuizRequest $request, $id)
     {
         $quiz = Quiz::findOrFail($id);
+        $this->authorize('update', $quiz);
         $quiz->update($this->normalizeAnswer($request->validated()));
 
         // Reindirizza con un messaggio di successo
@@ -67,6 +75,7 @@ class QuizController extends Controller
     public function destroy($id)
     {
         $quiz = Quiz::findOrFail($id);
+        $this->authorize('delete', $quiz);
         $quiz->delete();
 
         // Reindirizza con un messaggio di successo

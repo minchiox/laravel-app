@@ -19,7 +19,15 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    // '*' andava bene finche' l'unica rotta era '/api/user' senza credenziali,
+    // ma diventa un problema reale il giorno in cui l'API si allarga. Di
+    // default si restringe alla sola origine dell'app (frontend e backend
+    // sono la stessa applicazione, non serve altro); CORS_ALLOWED_ORIGINS in
+    // .env permette di aggiungerne altre, separate da virgola.
+    'allowed_origins' => array_values(array_filter(explode(
+        ',',
+        (string) env('CORS_ALLOWED_ORIGINS', env('APP_URL', ''))
+    ))),
 
     'allowed_origins_patterns' => [],
 

@@ -14,7 +14,12 @@
 #   dev   -> usato da docker-compose e dal devcontainer (codice bind-mounted)
 #   prod  -> immagine autosufficiente con vendor e asset gia' dentro
 
-ARG PHP_VERSION=8.2
+# Laravel 13 (target della migrazione, Project Doc Step 2/M4) richiede PHP
+# 8.3 minimo; si parte da 8.4 per restare a distanza di sicurezza dai
+# componenti Symfony che alcune patch 13.x richiedono su PHP 8.4 (vedi
+# Project Doc, nota su Symfony 8). Verificare la disponibilita' di PHP 8.4
+# sull'hosting di destinazione prima del deploy (Step D1).
+ARG PHP_VERSION=8.4
 ARG NODE_VERSION=20
 
 # ---------------------------------------------------------------------------

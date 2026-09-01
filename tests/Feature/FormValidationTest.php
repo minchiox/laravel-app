@@ -60,7 +60,7 @@ class FormValidationTest extends TestCase
 
     public function test_modificare_un_quiz_da_chiuso_ad_aperto_azzera_la_risposta_booleana(): void
     {
-        $quiz = Quiz::factory()->closed()->create(['answer' => true]);
+        $quiz = Quiz::factory()->closed()->create(['answer' => true, 'user_id' => $this->docente->id]);
 
         $this->actingAs($this->docente)->put(route('quiz.update', $quiz->id), [
             'question' => $quiz->question,

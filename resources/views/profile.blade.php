@@ -24,7 +24,9 @@
                                 </div>
 
                                 <div class="mb-3 col-md-6">
-                                    <img src="/avatars/{{ auth()->user()->avatar }}" style="width:80px;margin-top: 10px;">
+                                    @if (auth()->user()->avatar)
+                                        <img src="{{ route('user.avatar', auth()->user()->avatar) }}" style="width:80px;margin-top: 10px;">
+                                    @endif
                                 </div>
 
                             </div>
@@ -44,6 +46,19 @@
                                     <label for="email" class="form-label">Email: </label>
                                     <input class="form-control" type="text" id="email" name="email" value="{{ auth()->user()->email }}" autofocus="" >
                                     @error('email')
+                                    <span role="alert" class="text-danger">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="mb-3 col-md-6">
+                                    <label for="current_password" class="form-label">Current Password: </label>
+                                    <input class="form-control" type="password" id="current_password" name="current_password" autocomplete="current-password">
+                                    <div class="form-text">Richiesta solo per cambiare la password.</div>
+                                    @error('current_password')
                                     <span role="alert" class="text-danger">
                                         <strong>{{ $message }}</strong>
                                     </span>

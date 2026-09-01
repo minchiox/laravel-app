@@ -36,6 +36,13 @@ class Exam extends Model
         return $this->belongsToMany(Quiz::class);
     }
 
+    /** Il docente che ha creato l'esame. Non 'user()': quel nome e' gia' preso
+     *  dalla relazione verso gli studenti che lo hanno svolto. */
+    public function owner()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function user()
     {
         return $this->belongsToMany(User::class)->withPivot('user_points');
