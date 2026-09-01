@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Quiz;
+use App\Models\User;
 use Database\Factories\QuizFactory;
 use Illuminate\Database\Seeder;
 
@@ -15,9 +16,14 @@ class QuizzesSeeder extends Seeder
 {
     public function run(): void
     {
+        // Senza user_id esplicito, la factory ne genera uno nuovo per ogni
+        // quiz: il seed si ritrovava con decine di docenti fantasma invece
+        // che con l'unico docente della demo.
+        $docenteId = User::where('email', UserSeeder::TEACHER_EMAIL)->value('id');
+
         foreach (QuizFactory::SUBJECTS as $subject) {
-            Quiz::factory()->count(8)->closed()->subject($subject)->create();
-            Quiz::factory()->count(4)->open()->subject($subject)->create();
+            Quiz::factory()->count(8)->closed()->subject($subject)->create(['user_id' => $docenteId]);
+            Quiz::factory()->count(4)->open()->subject($subject)->create(['user_id' => $docenteId]);
         }
     }
 }

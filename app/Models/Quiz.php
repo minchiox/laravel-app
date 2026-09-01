@@ -43,6 +43,11 @@ class Quiz extends Model
         'answer' => 'boolean',
     ];
 
+    public function owner()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function library()
     {
         return $this->belongsToMany(Library::class);

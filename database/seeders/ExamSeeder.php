@@ -23,23 +23,25 @@ class ExamSeeder extends Seeder
     {
         [$matematica, $storia, $informatica] = QuizFactory::SUBJECTS;
 
+        $docenteId = User::where('email', UserSeeder::TEACHER_EMAIL)->value('id');
+
         // In corso: e' l'esame che uno studente puo' aprire e consegnare subito.
-        $this->exam($matematica, fn () => Exam::factory()->open());
+        $this->exam($matematica, $docenteId, fn () => Exam::factory()->open());
 
         // Non ancora iniziato: verifica che l'accesso anticipato venga bloccato.
-        $this->exam($informatica, fn () => Exam::factory()->upcoming());
+        $this->exam($informatica, $docenteId, fn () => Exam::factory()->upcoming());
 
         // Concluso e gia' consegnato da due studenti: popola la pagina risultati.
-        $concluso = $this->exam($storia, fn () => Exam::factory()->closed());
+        $concluso = $this->exam($storia, $docenteId, fn () => Exam::factory()->closed());
         $this->submitAnswers($concluso);
     }
 
     /**
      * @param  callable():\Illuminate\Database\Eloquent\Factories\Factory  $factory
      */
-    private function exam(string $subject, callable $factory): Exam
+    private function exam(string $subject, int $docenteId, callable $factory): Exam
     {
-        $exam = $factory()->create(['exam_name' => "Verifica di {$subject}"]);
+        $exam = $factory()->create(['exam_name' => "Verifica di {$subject}", 'user_id' => $docenteId]);
 
         $quizzes = Quiz::where('subject', $subject)->take(6)->get();
 

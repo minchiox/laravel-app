@@ -23,6 +23,11 @@ class Library extends Model
         'library_difficulty',
     ];
 
+    public function owner()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function quiz()
     {
         return $this->belongsToMany(Quiz::class);

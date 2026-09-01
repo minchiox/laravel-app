@@ -20,9 +20,11 @@ class ExamQuizController extends Controller
     public function index(Exam $exam)
     {
         $quiz= $exam->quiz()->get();
-        $availableQuiz = Quiz::all();
+        // Solo il materiale del docente che sta assemblando l'esame: non ha
+        // senso poter agganciare il quiz o la libreria di un collega.
+        $availableQuiz = Quiz::where('user_id', auth()->id())->get();
         $availableExams = Exam::all();
-        $availableLibraries = Library::all();
+        $availableLibraries = Library::where('user_id', auth()->id())->get();
 
         return view('exam.addquiz', compact('exam', 'quiz', 'availableQuiz','availableExams','availableLibraries'));
     }
@@ -33,6 +35,11 @@ class ExamQuizController extends Controller
         $examId = $request->input('exam_id');
         $quizId = $request->input('quiz_id');
         $exam = Exam::findOrFail($examId);
+        $this->authorize('update', $exam);
+
+        $quiz = Quiz::findOrFail($quizId);
+        $this->authorize('view', $quiz);
+
         //$exam->quiz()->attach($quizId);
         if (!$exam->quiz()->where('quiz_id', $quizId)->exists()) {
             $exam->quiz()->attach($quizId, ['created_at' => now()]);
@@ -52,6 +59,9 @@ class ExamQuizController extends Controller
     public function quiz_list($examId)
     {
         $exam = Exam::findOrFail($examId);
+        // La view mostra la colonna "Answer": la risposta corretta.
+        $this->authorize('view', $exam);
+
         $quizzes= $exam->quiz()->get();
 
         return view('exam.quizlist', compact('exam', 'quizzes'));
@@ -66,6 +76,8 @@ class ExamQuizController extends Controller
     public function quiz_destroy($examId, $quizId)
     {
         $exam = Exam::findOrFail($examId);
+        $this->authorize('update', $exam);
+
         $exam->quiz()->detach($quizId);
 
         $exam->total_points = $exam->quiz()->sum('points');
@@ -156,6 +168,8 @@ class ExamQuizController extends Controller
     public function indexingResults($examId)
     {
         $exam = Exam::findOrFail($examId);
+        $this->authorize('view', $exam);
+
         $users= $exam->user()->get();
 
         return view('exam.results', compact('exam','users'));
@@ -164,6 +178,8 @@ class ExamQuizController extends Controller
     public function displayUsersAnswer($userId, $examId){
 
         $exam = Exam::findOrFail($examId);
+        $this->authorize('view', $exam);
+
         $quizzes = $exam->quiz()->get()->pluck('id');
 
         $userAnswer = UserAnswer::where('user_id', $userId)
@@ -188,6 +204,8 @@ class ExamQuizController extends Controller
         $validated = $request->validated();
         $examId = $validated['exam_id'];
         $userId = $validated['user_id'];
+
+        $this->authorize('update', Exam::findOrFail($examId));
 
         $studentAnswers = UserAnswer::where('exam_id', $examId)
             ->where('user_id', $userId)
@@ -225,6 +243,8 @@ class ExamQuizController extends Controller
         // find() lasciava passare un id inesistente fino a $user->name,
         // un errore fatale invece di un 404 pulito.
         $exam = Exam::findOrFail($examId);
+        $this->authorize('view', $exam);
+
         $user = User::findOrFail($userId);
         $userAnswer = UserAnswer::where('user_id', $userId)
             ->where('exam_id', $examId)
@@ -248,6 +268,8 @@ class ExamQuizController extends Controller
     public function printExam($examId)
     {
         $exam = Exam::findOrFail($examId);
+        $this->authorize('view', $exam);
+
         $quizzes = $exam->quiz()->inRandomOrder()->get();
         $filename = "esame_{$examId}_in_bianco.pdf";
 

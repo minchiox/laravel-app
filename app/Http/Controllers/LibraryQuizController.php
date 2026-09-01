@@ -11,8 +11,11 @@ class LibraryQuizController extends Controller
     public function index(Library $library)
     {
         $quiz= $library->quiz()->get();
-        $availableQuiz = Quiz::all();
-       $availableLibraries = Library::all();
+        // Solo il materiale del docente che sta assemblando la libreria: non
+        // ha senso poter agganciare un quiz o richiamare una libreria di un
+        // collega.
+        $availableQuiz = Quiz::where('user_id', auth()->id())->get();
+        $availableLibraries = Library::where('user_id', auth()->id())->get();
 
 
         return view('library.index', compact('library', 'quiz', 'availableQuiz','availableLibraries'));
@@ -24,6 +27,10 @@ class LibraryQuizController extends Controller
         $quizId = $request->input('quiz_id');
 
         $library = Library::findOrFail($libraryId);
+        $this->authorize('update', $library);
+
+        $quiz = Quiz::findOrFail($quizId);
+        $this->authorize('view', $quiz);
 
         // Verifica se il quiz è già associato alla libreria
         if (!$library->quiz()->where('quiz_id', $quizId)->exists()) {
@@ -46,6 +53,9 @@ class LibraryQuizController extends Controller
     public function quiz_list($libraryId)
     {
         $library = Library::findOrFail($libraryId);
+        // La view mostra la colonna "Answer": la risposta corretta.
+        $this->authorize('view', $library);
+
         $quizzes= $library->quiz()->get();
 
         return view('library.quizlist', compact('library', 'quizzes'));
@@ -59,6 +69,8 @@ class LibraryQuizController extends Controller
     public function quiz_destroy($libraryId, $quizId)
     {
         $library = Library::findOrFail($libraryId);
+        $this->authorize('update', $library);
+
         $library->quiz()->detach($quizId);
 
         $quizzes = $library->quiz()->get();
@@ -77,6 +89,7 @@ class LibraryQuizController extends Controller
     public function getQuizzes($libraryId)
     {
         $library = Library::findOrFail($libraryId);
+        $this->authorize('view', $library);
 
         return response()->json(
             $library->quiz()->get(['quizzes.id', 'question', 'subject', 'difficulty', 'points'])

@@ -17,6 +17,7 @@ class LibraryController extends Controller
     {
         $library = new Library();
         $library->fill($request->validated());
+        $library->user_id = auth()->id();
         $library->save();
 
         return back()->with('success', 'Library added successfully.');
@@ -25,6 +26,7 @@ class LibraryController extends Controller
     public function destroy($id)
     {
         $library = Library::findOrFail($id);
+        $this->authorize('delete', $library);
         $library->delete();
 
         // Reindirizza con un messaggio di successo
@@ -34,12 +36,15 @@ class LibraryController extends Controller
     public function edit($id)
     {
         $library = Library::findOrFail($id);
+        $this->authorize('update', $library);
+
         return view('library.edit', compact('library'));
     }
 
     public function update(UpdateLibraryRequest $request, $id)
     {
         $library = Library::findOrFail($id);
+        $this->authorize('update', $library);
         $library->update($request->validated());
 
         // Reindirizza con un messaggio di successo

@@ -32,7 +32,7 @@ class ExamCorrectionTest extends TestCase
 
     public function test_la_correzione_non_esegue_una_query_sui_quiz_per_ogni_risposta(): void
     {
-        $exam = Exam::factory()->closed()->create();
+        $exam = Exam::factory()->closed()->create(['user_id' => $this->docente->id]);
         $quizzes = Quiz::factory()->closed()->count(5)->create(['answer' => true, 'points' => 2]);
         $exam->quiz()->attach($quizzes->pluck('id'));
         $exam->user()->attach($this->studente->id, ['created_at' => now(), 'updated_at' => now()]);
@@ -68,7 +68,7 @@ class ExamCorrectionTest extends TestCase
 
     public function test_ricorreggere_dopo_aver_cambiato_la_risposta_giusta_azzera_il_punteggio_della_risposta(): void
     {
-        $exam = Exam::factory()->closed()->create();
+        $exam = Exam::factory()->closed()->create(['user_id' => $this->docente->id]);
         $quiz = Quiz::factory()->closed()->create(['answer' => true, 'points' => 7]);
         $exam->quiz()->attach($quiz->id);
         $exam->user()->attach($this->studente->id, ['created_at' => now(), 'updated_at' => now()]);

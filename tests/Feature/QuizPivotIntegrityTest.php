@@ -35,7 +35,7 @@ class QuizPivotIntegrityTest extends TestCase
     public function test_rimuovere_un_quiz_da_un_esame_non_lo_rimuove_dagli_altri_esami(): void
     {
         $quiz = Quiz::factory()->create();
-        $esameA = Exam::factory()->create();
+        $esameA = Exam::factory()->create(['user_id' => $this->docente->id]);
         $esameB = Exam::factory()->create();
         $esameA->quiz()->attach($quiz->id);
         $esameB->quiz()->attach($quiz->id);
@@ -52,7 +52,7 @@ class QuizPivotIntegrityTest extends TestCase
     {
         $quizDaTenere = Quiz::factory()->create(['points' => 4]);
         $quizDaRimuovere = Quiz::factory()->create(['points' => 6]);
-        $esame = Exam::factory()->create();
+        $esame = Exam::factory()->create(['user_id' => $this->docente->id]);
         $esame->quiz()->attach([$quizDaTenere->id, $quizDaRimuovere->id]);
 
         // Assegnazione diretta, non mass assignment: total_points e' escluso
@@ -69,7 +69,7 @@ class QuizPivotIntegrityTest extends TestCase
     public function test_rimuovere_un_quiz_da_una_libreria_non_lo_rimuove_dalle_altre_librerie(): void
     {
         $quiz = Quiz::factory()->create();
-        $libreriaA = Library::factory()->create();
+        $libreriaA = Library::factory()->create(['user_id' => $this->docente->id]);
         $libreriaB = Library::factory()->create();
         $libreriaA->quiz()->attach($quiz->id);
         $libreriaB->quiz()->attach($quiz->id);

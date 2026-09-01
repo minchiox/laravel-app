@@ -84,7 +84,7 @@ class SecurityTest extends TestCase
 
     public function test_l_endpoint_dei_quiz_non_espone_le_risposte_corrette(): void
     {
-        $library = Library::factory()->create();
+        $library = Library::factory()->create(['user_id' => $this->docente->id]);
         $quiz = Quiz::factory()->closed()->create();
         $library->quiz()->attach($quiz->id);
 
@@ -249,7 +249,7 @@ class SecurityTest extends TestCase
 
     public function test_la_stampa_non_lascia_file_nella_webroot(): void
     {
-        $exam = Exam::factory()->closed()->create();
+        $exam = Exam::factory()->closed()->create(['user_id' => $this->docente->id]);
         $exam->quiz()->attach(Quiz::factory()->create()->id);
 
         $prima = glob(public_path('pdf/*.pdf')) ?: [];
