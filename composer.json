@@ -1,17 +1,15 @@
 {
-    "name": "laravel/laravel",
+    "name": "mexam/mexam",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "description": "MEXAM: piattaforma per esami ed esercitazioni tra studenti e professori.",
+    "keywords": ["laravel", "mexam", "esami"],
     "license": "MIT",
     "require": {
         "php": "^8.1",
         "barryvdh/laravel-dompdf": "^2.0",
-        "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
-        "laravel/tinker": "^2.8",
-        "laravel/ui": "^4.4"
+        "laravel/tinker": "^2.8"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
