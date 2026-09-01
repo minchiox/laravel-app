@@ -5,18 +5,23 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreExamRequest;
 use App\Http\Requests\UpdateExamRequest;
 use App\Models\Exam;
+use Inertia\Inertia;
 
 class ExamController extends Controller
 {
     public function index()
     {
-        return view('exam.create');
+        return Inertia::render('exam/create');
     }
+
     public function list()
     {
-        $availableExam = Exam::all();
+        $availableExam = Exam::all()->map(fn (Exam $exam) => [
+            ...$exam->toArray(),
+            'is_open' => $exam->isOpen(),
+        ]);
 
-        return view('exam.list', compact('availableExam'));
+        return Inertia::render('exam/list', compact('availableExam'));
     }
 
     public function store(StoreExamRequest $request)
@@ -29,7 +34,7 @@ class ExamController extends Controller
         $exam->user_id = auth()->id();
         $exam->save();
 
-        return back()->with('success', 'Exam added successfully.');
+        return back()->with('success', 'Esame aggiunto con successo.');
     }
 
     public function destroy($id)
@@ -39,7 +44,7 @@ class ExamController extends Controller
         $exam->delete();
 
         // Reindirizza con un messaggio di successo
-        return redirect()->route('exam.list')->with('success', 'Exam deleted successfully.');
+        return redirect()->route('exam.list')->with('success', 'Esame eliminato con successo.');
     }
 
     public function edit($id)
@@ -47,7 +52,16 @@ class ExamController extends Controller
         $exam = Exam::findOrFail($id);
         $this->authorize('update', $exam);
 
-        return view('exam.edit', compact('exam'));
+        return Inertia::render('exam/edit', [
+            // Il form usa <input type="datetime-local">, che si aspetta
+            // esattamente questo formato: senza, il campo non si precompilava
+            // mai (bug preesistente, mai passato alcun valore alla view).
+            'exam' => [
+                ...$exam->toArray(),
+                'startAt' => $exam->startAt->format('Y-m-d\TH:i'),
+                'dueAt' => $exam->dueAt->format('Y-m-d\TH:i'),
+            ],
+        ]);
     }
 
     public function update(UpdateExamRequest $request, $id)
@@ -57,7 +71,7 @@ class ExamController extends Controller
         $exam->update($request->validated());
 
         // Reindirizza con un messaggio di successo
-        return redirect()->route('exam.edit', $id)->with('success', 'Exam updated successfully.');
+        return redirect()->route('exam.edit', $id)->with('success', 'Esame aggiornato con successo.');
     }
 
 

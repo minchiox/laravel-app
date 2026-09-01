@@ -25,4 +25,5 @@ export interface ExamRow {
     startAt: string;
     dueAt: string;
     total_points: number | null;
+    is_open?: boolean;
 }
