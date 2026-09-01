@@ -10,12 +10,6 @@
                         <form method="POST" action="{{ route('library.store') }}" enctype="multipart/form-data">
                             @csrf
 
-                            @if (session('success'))
-                                <div class="alert alert-success" role="alert">
-                                    {{ session('success') }}
-                                </div>
-                            @endif
-
                             <div class="row mb-3">
                                 <div class="col-md-12">
                                     <label for="library_name" class="form-label">{{ __('Library') }}:</label>
@@ -27,7 +21,6 @@
                                     @enderror
                                 </div>
                             </div>
-
 
                             <div class="row mb-3">
                                 <div class="col-md-12">
@@ -69,6 +62,5 @@
             </div>
         </div>
     </div>
-
 
 @endsection

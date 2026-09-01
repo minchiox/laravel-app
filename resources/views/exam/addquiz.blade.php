@@ -6,17 +6,6 @@
                 <div class="card">
                     <div class="card-header">{{ __('Exam Quiz') }}</div>
 
-                    @if (session('success'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('success') }}
-                        </div>
-                    @endif
-                    @if (session('error'))
-                        <div class="alert alert-danger" role="alert">
-                            {{ session('error') }}
-                        </div>
-                    @endif
-
                     <div class="card-body">
                         <form id="formexam" method="POST" action="{{ route('examquiz.store') }}" enctype="multipart/form-data">
                             @csrf
@@ -51,7 +40,6 @@
                             </table>
 
                         </form>
-
 
                     </div>
                 </div>

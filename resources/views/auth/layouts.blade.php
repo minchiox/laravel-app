@@ -87,6 +87,14 @@
     </div>
 </nav>
 <div class="container mt-5">
+    {{-- Era ripetuto identico in 14 view che estendono questo layout. --}}
+    @if (session('success'))
+        <div class="alert alert-success" role="alert">{{ session('success') }}</div>
+    @endif
+    @if (session('error'))
+        <div class="alert alert-danger" role="alert">{{ session('error') }}</div>
+    @endif
+
     @yield('content')
 </div>
 </body>

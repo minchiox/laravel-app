@@ -6,16 +6,6 @@
             <div class="col-md-10">
                 <div class="scrollable-div" style="max-height: 300px; overflow-y: auto;">
 
-                    @if (session('success'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('success') }}
-                        </div>
-                    @endif
-                        @if (session('error'))
-                            <div class="alert alert-danger" role="alert">
-                                {{ session('error') }}
-                            </div>
-                        @endif
                     <table class="table">
                         <thead>
                         <tr>
@@ -49,7 +39,6 @@
                                     @if(!Auth::user()->isTeacher)
                                     <a href="{{ route('exam.access', $exam->id) }}" class="btn btn-primary">{{ __('Join') }}</a>
                                     @endif
-
 
                                 </td>
                             </tr>

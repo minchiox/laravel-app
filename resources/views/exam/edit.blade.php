@@ -12,12 +12,6 @@
                             @csrf
                             @method('PUT')
 
-                            @if (session('success'))
-                                <div class="alert alert-success" role="alert">
-                                    {{ session('success') }}
-                                </div>
-                            @endif
-
                             <div class="row mb-3">
                                 <div class="col-md-12">
                                     <label for="exam_name" class="form-label">{{ __('Name') }}:</label>
