@@ -59,6 +59,9 @@ export default function ExamList({ auth, nav, flash, availableExam }: ExamListPr
                                         {user.isTeacher ? (
                                             <>
                                                 <Button asChild variant="outline" size="sm">
+                                                    <a href={route('examquiz.index', exam.id)}>Aggiungi quiz</a>
+                                                </Button>
+                                                <Button asChild variant="outline" size="sm">
                                                     <a href={route('exam.quiz', exam.id)}>Quiz</a>
                                                 </Button>
                                                 <Button asChild variant="outline" size="sm">

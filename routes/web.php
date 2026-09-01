@@ -132,10 +132,12 @@ Route::middleware(['auth', 'isTeacher'])->group(function () {
     Route::delete('/exams/{id}', [ExamController::class, 'destroy'])->name('exam.destroy');
 
     // --- Quiz dentro gli esami ----------------------------------------
-    Route::get('/examquiz', [ExamQuizController::class, 'index'])->name('examquiz.index');
+    // Stesso motivo della rotta gemella su libraryquiz.index: senza {exam}
+    // nell'URL il type-hint Exam $exam del controller non veniva risolto per
+    // route-model-binding.
+    Route::get('/exams/{exam}/quiz-picker', [ExamQuizController::class, 'index'])->name('examquiz.index');
     Route::post('/examquiz', [ExamQuizController::class, 'store'])->name('examquiz.store');
     Route::get('/examquiz/{id}/quiz', [ExamQuizController::class, 'quiz_list'])->name('exam.quiz');
-    Route::post('/examquiz/{id}/quiz', [ExamQuizController::class, 'quiz_list']);
     // Stesso motivo della rotta gemella su library.quiz.destroy: serve l'id
     // dell'esame per scollegare il quiz da quello soltanto.
     Route::delete('/examquiz/{idexam}/quiz/{idquiz}', [ExamQuizController::class, 'quiz_destroy'])->name('exam.quiz.destroy');

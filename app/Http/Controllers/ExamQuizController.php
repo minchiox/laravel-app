@@ -13,25 +13,27 @@ use App\Models\UserAnswer;
 use App\Models\User;
 use PDF;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 
 class ExamQuizController extends Controller
 {
     public function index(Exam $exam)
     {
-        $quiz= $exam->quiz()->get();
+        $this->authorize('update', $exam);
+
         // Solo il materiale del docente che sta assemblando l'esame: non ha
-        // senso poter agganciare il quiz o la libreria di un collega.
-        $availableQuiz = Quiz::where('user_id', auth()->id())->get();
-        $availableExams = Exam::all();
+        // senso poter richiamare la libreria di un collega.
         $availableLibraries = Library::where('user_id', auth()->id())->get();
 
-        return view('exam.addquiz', compact('exam', 'quiz', 'availableQuiz','availableExams','availableLibraries'));
+        return Inertia::render('exam/addquiz', [
+            'exam' => $exam,
+            'availableLibraries' => $availableLibraries,
+        ]);
     }
 
     public function store(Request $request)
     {
-        $request->all();
         $examId = $request->input('exam_id');
         $quizId = $request->input('quiz_id');
         $exam = Exam::findOrFail($examId);
@@ -40,7 +42,6 @@ class ExamQuizController extends Controller
         $quiz = Quiz::findOrFail($quizId);
         $this->authorize('view', $quiz);
 
-        //$exam->quiz()->attach($quizId);
         if (!$exam->quiz()->where('quiz_id', $quizId)->exists()) {
             $exam->quiz()->attach($quizId, ['created_at' => now()]);
             $totalPoints = $exam->quiz()->sum('points');
@@ -48,12 +49,11 @@ class ExamQuizController extends Controller
             $exam->save();
 
             // Reindirizza l'utente alla route desiderata con un messaggio di successo
-            return redirect()->route('examquiz.index')->with('success', 'Quiz aggiunto con successo all\'esame.');
+            return redirect()->route('examquiz.index', $exam->id)->with('success', 'Quiz aggiunto con successo all\'esame.');
         } else {
             // Quiz già associato alla libreria, ritorna con un messaggio di errore
             return redirect()->back()->with('error', 'Il quiz è già associato a questo esame.');
         }
-        //return redirect()->route('examquiz.index')->with('success', 'Quiz aggiunto con successo all esame.');
     }
 
     public function quiz_list($examId)
@@ -64,7 +64,10 @@ class ExamQuizController extends Controller
 
         $quizzes= $exam->quiz()->get();
 
-        return view('exam.quizlist', compact('exam', 'quizzes'));
+        return Inertia::render('exam/quizlist', [
+            'exam' => $exam,
+            'quizzes' => $quizzes->makeVisible(['answer', 'answer_text']),
+        ]);
     }
 
     /**
@@ -83,9 +86,9 @@ class ExamQuizController extends Controller
         $exam->total_points = $exam->quiz()->sum('points');
         $exam->save();
 
-        $quizzes = $exam->quiz()->get();
-
-        return view('exam.quizlist', compact('exam', 'quizzes'));
+        // Era un `return view(...)` diretto: non valido per il protocollo
+        // Inertia, che su risposte non-GET si aspetta un redirect.
+        return redirect()->back()->with('success', 'Quiz rimosso dall\'esame.');
     }
 
     /**
@@ -109,9 +112,19 @@ class ExamQuizController extends Controller
                 ->with('error', 'Hai gia\' consegnato questo esame.');
         }
 
-        return view('exam.access', [
+        return Inertia::render('exam/access', [
             'exam' => $exam,
-            'quizzes' => $exam->quiz()->inRandomOrder()->get(),
+            // Quiz::$hidden esclude answer/answer_text dalla serializzazione,
+            // ma qui serve comunque sapere se la domanda e' vero/falso o a
+            // risposta aperta per scegliere il controllo giusto: si espone
+            // solo un discriminatore booleano, letto via property access (che
+            // $hidden non tocca) prima ancora che il modello vada in JSON, mai
+            // il valore della risposta corretta.
+            'quizzes' => $exam->quiz()->inRandomOrder()->get()->map(fn (Quiz $quiz) => [
+                'id' => $quiz->id,
+                'question' => $quiz->question,
+                'type' => $quiz->answer_text !== null ? 'open' : 'close',
+            ]),
         ]);
     }
 
@@ -170,9 +183,16 @@ class ExamQuizController extends Controller
         $exam = Exam::findOrFail($examId);
         $this->authorize('view', $exam);
 
-        $users= $exam->user()->get();
+        $users = $exam->user()->get()->map(fn (User $user) => [
+            'id' => $user->id,
+            'name' => $user->name,
+            // withPivot('user_points') sulla relazione Exam::user(): il
+            // punteggio era gia' calcolato da correctAnswer() ma mai
+            // mostrato in nessuna view.
+            'user_points' => $user->pivot->user_points,
+        ]);
 
-        return view('exam.results', compact('exam','users'));
+        return Inertia::render('exam/results', compact('exam', 'users'));
     }
 
     public function displayUsersAnswer($userId, $examId){
@@ -180,16 +200,18 @@ class ExamQuizController extends Controller
         $exam = Exam::findOrFail($examId);
         $this->authorize('view', $exam);
 
-        $quizzes = $exam->quiz()->get()->pluck('id');
+        $quizIds = $exam->quiz()->get()->pluck('id');
 
         $userAnswer = UserAnswer::where('user_id', $userId)
-            ->whereIn('quiz_id', $quizzes)
+            ->whereIn('quiz_id', $quizIds)
             ->where('exam_id', $examId)
-            ->get();
+            ->get(['quiz_id', 'answer', 'answer_text']);
 
-        $quizzes = $exam->quiz()->get();
+        // Niente makeVisible: questa pagina mostra solo cosa ha risposto lo
+        // studente, mai la risposta corretta del quiz.
+        $quizzes = $exam->quiz()->get(['quizzes.id', 'question']);
 
-        return view('exam.resultsuser', compact('userAnswer', 'quizzes', 'exam','userId'));
+        return Inertia::render('exam/resultsuser', compact('userAnswer', 'quizzes', 'exam', 'userId'));
 
     }
 
@@ -231,9 +253,13 @@ class ExamQuizController extends Controller
         // Aggiorna lo score totale dell'utente nella tabella exam_user
         DB::table('exam_user')->where('exam_id', $examId)->where('user_id', $userId)->update(['user_points' => $totalScore]);
 
-        // Restituisci la vista con un messaggio di successo
-        $availableExam = Exam::all();
-        return view('exam.list', compact('availableExam'))->with('success', 'L\'esame è stato correttamente valutato.');
+        // Prima restituiva direttamente exam.list, una pagina scollegata dal
+        // compito appena corretto (oltre a non essere un redirect, non
+        // valido per il protocollo Inertia su una risposta non-GET). Si
+        // torna invece sulla scheda del compito appena valutato.
+        return redirect()
+            ->route('display.users.answer', ['iduser' => $userId, 'idexam' => $examId])
+            ->with('success', 'L\'esame è stato correttamente valutato.');
     }
 
 

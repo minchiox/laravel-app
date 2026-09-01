@@ -42,7 +42,7 @@ class QuizPivotIntegrityTest extends TestCase
 
         $this->actingAs($this->docente)
             ->delete(route('exam.quiz.destroy', ['idexam' => $esameA->id, 'idquiz' => $quiz->id]))
-            ->assertOk();
+            ->assertRedirect();
 
         $this->assertSame(0, $esameA->quiz()->count());
         $this->assertSame(1, $esameB->quiz()->count(), 'Il quiz e\' sparito anche dall\'esame non toccato.');
