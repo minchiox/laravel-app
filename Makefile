@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help up down build restart logs shell dbshell fresh seed test pint pint-check route-check dev pma clean
+.PHONY: help up down build restart logs shell dbshell fresh seed test pint pint-check route-check dev types pma clean
 
 DC   := docker compose
 EXEC := $(DC) exec app
@@ -50,8 +50,11 @@ route-check: ## Elenca le rotte e verifica che route:cache non esploda
 	$(EXEC) php artisan route:cache
 	$(EXEC) php artisan route:clear
 
-dev: ## Avvia Vite in hot reload su :5273
+dev: ## Avvia Vite in hot reload su :5273 (fa anche npm install)
 	$(DC) --profile dev up node
+
+types: ## Verifica i tipi TypeScript (tsc --noEmit) senza avviare Vite
+	$(DC) run --rm node sh -c "npm install && npm run types:check"
 
 pma: ## Apre phpMyAdmin nel browser
 	@open http://localhost:$${PMA_PORT:-8181} 2>/dev/null || echo "http://localhost:$${PMA_PORT:-8181}"

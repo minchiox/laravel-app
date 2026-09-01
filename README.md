@@ -89,6 +89,21 @@ sul CSS/JS con hot reload serve il servizio Vite:
 make dev           # oppure: docker compose --profile dev up node
 ```
 
+`make dev` esegue `npm install` a ogni avvio (vedi `command:` del servizio `node` in
+`docker-compose.yml`): dopo aver tirato giu' commit che aggiungono o aggiornano dipendenze JS (come
+lo Step 16, che ha introdotto Ziggy e i pacchetti Radix mancanti) basta rilanciarlo, non serve nessun
+`npm install` manuale ne' un rebuild dell'immagine `app`.
+
+L'intera SPA (tutte le pagine tranne la stampa PDF) e' React 19 + TypeScript. Per un controllo dei
+tipi senza tenere Vite in esecuzione:
+
+```bash
+make types         # tsc --noEmit dentro il servizio node
+```
+
+Non e' ancora agganciato alla CI (`vendor/bin/phpunit` e' l'unico step in `.github/workflows/tests.yml`
+al momento): lanciarlo a mano prima di aprire una PR che tocca `resources/js/`.
+
 ### Porte
 
 Volutamente non standard, perche' 80, 8080, 9000, 6033 e 8081 sono spesso gia' occupate da altri
