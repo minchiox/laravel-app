@@ -77,7 +77,9 @@ services:
   # Vite in watch mode. Non parte di default: l'app funziona con gli asset
   # gia' compilati, questo serve solo mentre si lavora sul frontend.
   node:
-    image: node:20-alpine
+    # Allineata al NODE_VERSION del Dockerfile: vite 8 (Step F1) richiede
+    # Node ^20.19 o >=22.12, e 20 e' gia' EOL.
+    image: node:22-alpine
     working_dir: /app
     volumes:
       - ./:/app

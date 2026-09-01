@@ -8,6 +8,7 @@ use App\Http\Controllers\LibraryQuizController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuizController;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,7 +31,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return auth()->check()
         ? redirect()->route('dashboard')
-        : view('welcome');
+        : Inertia::render('welcome', ['canRegister' => Route::has('register')]);
 });
 
 /*
