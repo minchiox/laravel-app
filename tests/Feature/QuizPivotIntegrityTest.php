@@ -76,7 +76,7 @@ class QuizPivotIntegrityTest extends TestCase
 
         $this->actingAs($this->docente)
             ->delete(route('library.quiz.destroy', ['idlibrary' => $libreriaA->id, 'idquiz' => $quiz->id]))
-            ->assertOk();
+            ->assertRedirect();
 
         $this->assertSame(0, $libreriaA->quiz()->count());
         $this->assertSame(1, $libreriaB->quiz()->count(), 'Il quiz e\' sparito anche dalla libreria non toccata.');

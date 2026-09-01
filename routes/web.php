@@ -109,11 +109,14 @@ Route::middleware(['auth', 'isTeacher'])->group(function () {
     Route::delete('/libraries/{id}', [LibraryController::class, 'destroy'])->name('library.destroy');
 
     // --- Quiz dentro le librerie --------------------------------------
-    Route::get('/libraryquiz', [LibraryQuizController::class, 'index'])->name('libraryquiz.index');
+    // Prima non aveva {library} nell'URL: il type-hint Library $library nel
+    // controller non veniva risolto per route-model-binding ma da
+    // un'istanza vuota via container, quindi la pagina era solo un picker
+    // generico invece di partire gia' filtrata sulla libreria di provenienza.
+    Route::get('/libraries/{library}/quiz-picker', [LibraryQuizController::class, 'index'])->name('libraryquiz.index');
     Route::post('/libraryquiz', [LibraryQuizController::class, 'store'])->name('libraryquiz.store');
     // library.quiz mostra le risposte corrette nella colonna "Answer"
     Route::get('/libraryquiz/{id}/quiz', [LibraryQuizController::class, 'quiz_list'])->name('library.quiz');
-    Route::post('/libraryquiz/{id}/quiz', [LibraryQuizController::class, 'quiz_list']);
     // La rotta porta l'id della libreria oltre a quello del quiz: senza,
     // il controller non sa da quale libreria scollegare il quiz e finiva per
     // scollegarlo da tutte quelle a cui era associato.

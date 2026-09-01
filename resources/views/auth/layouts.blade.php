@@ -66,7 +66,10 @@
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                             @if(Auth::user()->isTeacher)
                             <a href="{{ route('library.library') }}" class="dropdown-item">Make Library</a>
-                            <a href="{{ route('libraryquiz.index') }}" class="dropdown-item">Add Quiz to Library</a>
+                            {{-- "Add Quiz to Library" rimosso: libraryquiz.index ora richiede
+                                 l'id di una libreria specifica (Step 20), quindi si raggiunge
+                                 solo dall'azione "Aggiungi quiz" sulla riga della libreria in
+                                 Libraries List. --}}
                             @endif
                             <a href="{{ route('libraryquiz.list') }}" class="dropdown-item">Libraries List</a>
                         </div>
