@@ -53,13 +53,19 @@ studente puo' aprirlo e consegnarlo subito), **non ancora iniziato** (Informatic
 
 Apri la cartella in VS Code e scegli **Reopen in Container**: l'editor si collega al container `app`
 gia' in esecuzione, con PHP, Composer, le estensioni e il codice montato in `/var/www`. Il terminale
-integrato e' dentro il container, quindi `php artisan ...` funziona direttamente.
+integrato e' dentro il container, quindi `php artisan ...`, `composer ...` e `vendor/bin/phpunit`
+funzionano direttamente, senza `make` ne' `docker compose exec`.
 
-Node non e' installato nell'immagine PHP: per il frontend si usa il servizio `node` (`make dev`).
+**`make` e Docker no**: il container `app` non ha il CLI Docker (ne' l'accesso al socket dell'host),
+quindi qualunque comando che parte da `docker compose` — tutto il `Makefile`, `make dev` compreso —
+da quel terminale fallisce con `docker: No such file or directory`. Per Node/Vite (il servizio `app`
+non lo ha installato) e per qualunque `make ...` serve un **secondo terminale sull'host**, fuori da VS
+Code Dev Containers: vedi la sezione seguente.
 
 ### Con Docker da terminale
 
-Il `Makefile` copre i comandi ricorrenti:
+Da un terminale **sull'host** (non quello integrato di un Dev Container gia' connesso ad `app`: li'
+dentro non c'e' il CLI Docker). Il `Makefile` copre i comandi ricorrenti:
 
 ```bash
 make up            # avvia l'app
