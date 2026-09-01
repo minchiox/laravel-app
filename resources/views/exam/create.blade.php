@@ -10,12 +10,6 @@
                         <form method="POST" action="{{ route('exam.store') }}" enctype="multipart/form-data">
                             @csrf
 
-                            @if (session('success'))
-                                <div class="alert alert-success" role="alert">
-                                    {{ session('success') }}
-                                </div>
-                            @endif
-
                             <div class="row mb-3">
                                 <div class="col-md-12">
                                     <label for="exam_name" class="form-label">{{ __('Exam') }}:</label>
@@ -27,7 +21,6 @@
                                     @enderror
                                 </div>
                             </div>
-
 
                             <div class="row mb-3">
                                 <div class="col-md-12">
@@ -64,6 +57,5 @@
             </div>
         </div>
     </div>
-
 
 @endsection

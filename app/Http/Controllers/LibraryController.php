@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreLibraryRequest;
+use App\Http\Requests\UpdateLibraryRequest;
 use App\Models\Library;
-use Illuminate\Http\Request;
 
 class LibraryController extends Controller
 {
@@ -12,18 +13,11 @@ class LibraryController extends Controller
         return view('library.library');
     }
 
-    public function store(Request $request)
+    public function store(StoreLibraryRequest $request)
     {
-        $request->validate([
-            'library_name' => 'required',
-            'library_difficulty' => 'required',
-            'library_subject' => 'required',
-        ]);
-
-        $input = $request->all();
-        $libraries = new Library();
-        $libraries->fill($input);
-        $libraries-> save();
+        $library = new Library();
+        $library->fill($request->validated());
+        $library->save();
 
         return back()->with('success', 'Library added successfully.');
     }
@@ -43,22 +37,10 @@ class LibraryController extends Controller
         return view('library.edit', compact('library'));
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateLibraryRequest $request, $id)
     {
-        $request->validate([
-            'library_name' => 'required',
-            'library_subject' => 'required',
-            'library_difficulty' => 'required',
-            // Aggiungi altre regole di validazione qui se necessario
-        ]);
-
         $library = Library::findOrFail($id);
-        $input = $request->all();
-
-        //Se la risposta è booleana
-
-        // Salva le modifiche
-        $library->update($input);
+        $library->update($request->validated());
 
         // Reindirizza con un messaggio di successo
         return redirect()->route('library.edit', $id)->with('success', 'Library updated successfully.');

@@ -10,12 +10,6 @@
                         <form method="POST" action="{{ route('quiz.store') }}" enctype="multipart/form-data">
                             @csrf
 
-                            @if (session('success'))
-                                <div class="alert alert-success" role="alert">
-                                    {{ session('success') }}
-                                </div>
-                            @endif
-
                             <div class="row mb-3">
                                 <div class="col-md-12">
                                     <label for="question" class="form-label">{{ __('Question') }}:</label>

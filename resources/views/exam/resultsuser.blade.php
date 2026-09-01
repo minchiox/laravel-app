@@ -6,16 +6,6 @@
             <div class="col-md-10">
                 <div class="scrollable-div" style="max-height: 500px; overflow-y: auto;">
 
-                    @if (session('success'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('success') }}
-                        </div>
-                    @endif
-                    @if (session('error'))
-                        <div class="alert alert-danger" role="alert">
-                            {{ session('error') }}
-                        </div>
-                    @endif
                     <form id="form_user_answer" method="POST" action="{{ route('display.users.answerP') }}" enctype="multipart/form-data">
                         <input class="form-control" type="hidden" name="exam_id" id="exam_id" value="{{ $exam->id }}">
                         <input class="form-control" type="hidden" name="user_id" id="user_id" value="{{ $userId }}">
@@ -55,7 +45,6 @@
                                 </div>
                             </div>
                         @endforeach
-
 
                         @csrf
                         <button type="submit" class="btn btn-primary align-items-center">{{ __('Correct') }}</button>

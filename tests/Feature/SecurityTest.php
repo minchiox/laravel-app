@@ -178,7 +178,7 @@ class SecurityTest extends TestCase
         $exam->quiz()->attach($quiz->id);
 
         $this->actingAs($this->studente)
-            ->delete(route('exam.quiz.destroy', $quiz->id))
+            ->delete(route('exam.quiz.destroy', ['idexam' => $exam->id, 'idquiz' => $quiz->id]))
             ->assertForbidden();
 
         $this->assertSame(1, $exam->quiz()->count());

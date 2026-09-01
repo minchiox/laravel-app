@@ -11,12 +11,6 @@
                         <form method="POST" action="{{ route('user.profile.store') }}" enctype="multipart/form-data">
                             @csrf
 
-                            @if (session('success'))
-                                <div class="alert alert-success" role="alert" class="text-danger">
-                                    {{ session('success') }}
-                                </div>
-                            @endif
-
                             <div class="row">
                                 <div class="mb-3 col-md-6">
                                     <label for="name" class="form-label">Avatar: </label>

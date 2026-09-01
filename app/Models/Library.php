@@ -10,8 +10,14 @@ class Library extends Model
 {
     use HasFactory;
 
+    /**
+     * 'id' era mass assignable (la chiave primaria), come per Exam prima
+     * dello Step 1: un POST su /library con id= poteva scontrarsi con una
+     * riga esistente o imporre un id scelto dal chiamante.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
-        'id',
         'library_name',
         'library_subject',
         'library_difficulty',
@@ -19,6 +25,6 @@ class Library extends Model
 
     public function quiz()
     {
-        return $this->belongsToMany(Quiz::class); //ritorna belongsToMany errore
+        return $this->belongsToMany(Quiz::class);
     }
 }

@@ -45,24 +45,25 @@ class LibraryQuizController extends Controller
 
     public function quiz_list($libraryId)
     {
-        $library = Library::find($libraryId);
+        $library = Library::findOrFail($libraryId);
         $quizzes= $library->quiz()->get();
 
-        return view('library.quizlist', ['quizzes' => $quizzes]);
+        return view('library.quizlist', compact('library', 'quizzes'));
     }
 
-    public function quiz_destroy($quizId)
+    /**
+     * `library()->detach()` senza argomenti scollegava il quiz da OGNI
+     * libreria a cui era associato, non solo da questa: un quiz condiviso fra
+     * piu' librerie spariva ovunque cancellandolo da una sola.
+     */
+    public function quiz_destroy($libraryId, $quizId)
     {
-        $quizzes = Quiz::find($quizId);
+        $library = Library::findOrFail($libraryId);
+        $library->quiz()->detach($quizId);
 
-        // Retrieve the library ID before detaching the quiz
-        $libraryId = $quizzes->library()->first()->id;
-        $quizzes->library()->detach();
+        $quizzes = $library->quiz()->get();
 
-        $library = Library::with('quiz')->find($libraryId);
-        $quizzes = $library->quiz;
-
-        return view('library.quizlist', ['quizzes' => $quizzes]);
+        return view('library.quizlist', compact('library', 'quizzes'));
     }
 
     /**

@@ -40,7 +40,7 @@
                                 <td>{{ $quiz->created_at }}</td>
                                 <td>
                                     @if(Auth::user()->isTeacher)
-                                    <form action="{{ route('library.quiz.destroy', $quiz->id) }}" method="POST" style="display: inline;">
+                                    <form action="{{ route('library.quiz.destroy', [$library->id, $quiz->id]) }}" method="POST" style="display: inline;">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-danger">Delete</button>

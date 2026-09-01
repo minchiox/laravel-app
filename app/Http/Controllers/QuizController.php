@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreQuizRequest;
+use App\Http\Requests\UpdateQuizRequest;
 use App\Models\Quiz;
 
 class QuizController extends Controller
@@ -38,16 +40,11 @@ class QuizController extends Controller
         $quizzes = Quiz::all();
         return view('quiz.index', ['quizzes' => $quizzes]);
     }
-    public function store(Request $request)
+    public function store(StoreQuizRequest $request)
     {
-        $request->validate([
-            'question' => 'required',
-        ]);
-
-        $input = $request->all();
         $quiz = new Quiz();
-        $quiz->fill($input);
-        $quiz-> save();
+        $quiz->fill($this->normalizeAnswer($request->validated()));
+        $quiz->save();
 
         return back()->with('success', 'Quiz added successfully.');
     }
@@ -58,36 +55,15 @@ class QuizController extends Controller
         return view('quiz.edit', compact('quiz'));
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateQuizRequest $request, $id)
     {
-        $request->validate([
-            'question' => 'required',
-            'answer-type' => 'required',
-            // Aggiungi altre regole di validazione qui se necessario
-        ]);
-
         $quiz = Quiz::findOrFail($id);
-        //$quiz->question = $request->question;
-        $input = $request->all();
-
-        //Se la risposta è booleana
-        if($request->filled('answer')){
-            unset($input['answer_text']);
-            $input['answer_text'] = null;
-
-        }
-        else
-        {
-            unset($input['answer']);
-            $input['answer'] = null;
-        }
-
-        // Salva le modifiche
-        $quiz->update($input);
+        $quiz->update($this->normalizeAnswer($request->validated()));
 
         // Reindirizza con un messaggio di successo
         return redirect()->route('quiz.edit', $id)->with('success', 'Quiz updated successfully.');
     }
+
     public function destroy($id)
     {
         $quiz = Quiz::findOrFail($id);
@@ -97,4 +73,26 @@ class QuizController extends Controller
         return redirect()->route('quiz.list')->with('success', 'Quiz deleted successfully.');
     }
 
+    /**
+     * 'answer-type' e' un controllo di form, non una colonna: sceglie quale
+     * delle due risposte e' quella valida e azzera l'altra. Senza, passare un
+     * quiz da vero/falso a risposta aperta (o viceversa) lasciava anche il
+     * valore del tipo precedente, violando l'invariante "o answer o
+     * answer_text" su cui si basa la correzione.
+     *
+     * @param  array<string, mixed>  $input
+     * @return array<string, mixed>
+     */
+    private function normalizeAnswer(array $input): array
+    {
+        if ($input['answer-type'] === 'open') {
+            $input['answer'] = null;
+        } else {
+            $input['answer_text'] = null;
+        }
+
+        unset($input['answer-type']);
+
+        return $input;
+    }
 }
