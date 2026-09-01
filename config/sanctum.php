@@ -76,11 +76,12 @@ return [
 
     'middleware' => [
         'authenticate_session' => Laravel\Sanctum\Http\Middleware\AuthenticateSession::class,
-        'encrypt_cookies' => App\Http\Middleware\EncryptCookies::class,
-        // Sanctum 4 (Laravel 11) si aspetta questa chiave rinominata da
-        // 'verify_csrf_token': con il nome vecchio, l'override della classe
-        // custom smetteva di essere applicato.
-        'validate_csrf_token' => App\Http\Middleware\VerifyCsrfToken::class,
+        // Gli stub App\Http\Middleware\EncryptCookies/VerifyCsrfToken non
+        // aggiungevano alcuna personalizzazione ($except vuoto) e sono stati
+        // rimossi con lo skeleton Kernel-based (Step M2): qui puntano
+        // direttamente alle classi base, lo stesso comportamento di prima.
+        'encrypt_cookies' => Illuminate\Cookie\Middleware\EncryptCookies::class,
+        'validate_csrf_token' => Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
     ],
 
 ];

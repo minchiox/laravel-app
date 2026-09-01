@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Providers\RouteServiceProvider;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,7 +20,11 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
-                return redirect(RouteServiceProvider::HOME);
+                // Puntava a RouteServiceProvider::HOME ('/home'), una rotta
+                // che qui non e' mai esistita: un utente gia' autenticato
+                // che apriva /login riceveva un 404 invece di finire sulla
+                // dashboard.
+                return redirect()->route('dashboard');
             }
         }
 
