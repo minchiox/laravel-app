@@ -6,7 +6,7 @@ Un docente costruisce un archivio di domande (**quiz**), le raggruppa in **libre
 difficolta', e ne compone degli **esami** con una finestra temporale. Gli studenti svolgono l'esame
 online; il docente ne vede i risultati, li corregge e puo' stamparli in PDF.
 
-- **Stack**: PHP 8.3 · Laravel 13 · MySQL 8 · Inertia.js + React 19 + Tailwind · Vite
+- **Stack**: PHP 8.4 · Laravel 13 · MySQL 8 · Inertia.js + React 19 + Tailwind · Vite
 - **Ambiente**: Docker Compose, con devcontainer pronto per VS Code
 
 ---

@@ -20,10 +20,12 @@ jobs:
 
     strategy:
       fail-fast: true
-      # Allineata al runtime del Dockerfile (PHP 8.4): 8.1 non e' piu'
-      # supportato da nessuna versione Laravel in uso o target.
+      # Solo 8.4: composer.lock ha risolto pacchetti Symfony 8.1.x che
+      # richiedono PHP >=8.4.1 (vedi commit "Fix: PHP 8.4 come minimo
+      # richiesto"), quindi 8.3 non installa piu' nonostante il Dockerfile
+      # avesse gia' scelto 8.4 come runtime di riferimento.
       matrix:
-        php: [8.3, 8.4]
+        php: [8.4]
 
     name: PHP ${{ matrix.php }}
 
