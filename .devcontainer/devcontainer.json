@@ -1,5 +1,5 @@
 {
-    "name": "MEXAM (Laravel 10 · PHP 8.2)",
+    "name": "MEXAM (Laravel · PHP 8.2)",
 
     // Riusa il compose di progetto invece di definire un'immagine a parte:
     // un solo posto da aggiornare, nessuna deriva tra `docker compose up` e
@@ -9,11 +9,22 @@
     "workspaceFolder": "/var/www",
 
     // Senza questo VS Code avvierebbe solo `app` e le sue dipendenze, quindi
-    // nginx resterebbe giu' e il sito non sarebbe raggiungibile.
+    // nginx e phpMyAdmin resterebbero giu'.
     "runServices": ["app", "db", "webserver", "phpmyadmin"],
 
-    "shutdownAction": "stopCompose",
+    // Il servizio deve restare vivo con il suo ENTRYPOINT (php-fpm): non va
+    // sostituito con il comando "sleep infinity" di default.
+    "overrideCommand": false,
+
     "remoteUser": "www",
+
+    // NIENTE forwardPorts.
+    // I numeri nudi si riferiscono al container primario (`app`), che ascolta
+    // solo su 9000: dichiarare 8088/8181/33061 faceva ritentare a vuoto
+    // l'inoltro di porte su cui, in quel container, non ascolta nessuno.
+    // Le porte sono gia' pubblicate sull'host dal compose:
+    //   app  http://localhost:8088     phpMyAdmin  http://localhost:8181
+    //   db   127.0.0.1:33061
 
     "customizations": {
         "vscode": {
@@ -28,22 +39,21 @@
                 "php.validate.executablePath": "/usr/local/bin/php",
                 "intelephense.environment.phpVersion": "8.2",
                 "files.eol": "\n",
-                "emmet.includeLanguages": {
-                    "blade": "html"
-                },
-                "terminal.integrated.defaultProfile.linux": "bash"
+                "emmet.includeLanguages": { "blade": "html" },
+                "terminal.integrated.defaultProfile.linux": "bash",
+                // vendor/ e' oltre 100 MB su bind mount: escluderlo dal
+                // file watcher evita che VS Code ci lavori sopra all'avvio
+                "files.watcherExclude": {
+                    "**/vendor/**": true,
+                    "**/node_modules/**": true,
+                    "**/storage/framework/**": true,
+                    "**/public/build/**": true
+                }
             }
         }
     },
 
-    "forwardPorts": [8088, 8181, 33061],
-    "portsAttributes": {
-        "8088": { "label": "MEXAM" },
-        "8181": { "label": "phpMyAdmin" },
-        "33061": { "label": "MySQL" }
-    },
-
-    // Solo Composer: Node vive nel servizio `node` del compose (profilo `dev`),
-    // per non appesantire l'immagine PHP. Per il frontend: `make dev`.
+    // L'ENTRYPOINT del container ha gia' fatto composer install, migrazioni e
+    // seed: qui basta assicurarsi che le dipendenze di sviluppo ci siano.
     "postCreateCommand": "composer install --no-interaction"
 }
