@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Carbon;
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreExamRequest;
+use App\Http\Requests\UpdateExamRequest;
 use App\Models\Exam;
 
 class ExamController extends Controller
@@ -19,18 +19,11 @@ class ExamController extends Controller
         return view('exam.list', compact('availableExam'));
     }
 
-    public function store(Request $request)
+    public function store(StoreExamRequest $request)
     {
-        $request->validate([
-            'exam_name' => 'required',
-            'startAt' => 'required',
-            'dueAt' => 'required',
-        ]);
-
-        $input = $request->all();
-        $exams= new Exam();
-        $exams->fill($input);
-        $exams-> save();
+        $exam = new Exam();
+        $exam->fill($request->validated());
+        $exam->save();
 
         return back()->with('success', 'Exam added successfully.');
     }
@@ -50,19 +43,10 @@ class ExamController extends Controller
         return view('exam.edit', compact('exam'));
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateExamRequest $request, $id)
     {
-        $request->validate([
-            'exam_name' => 'required',
-            // Aggiungi altre regole di validazione qui se necessario
-        ]);
-
         $exam = Exam::findOrFail($id);
-        $input = $request->all();
-
-
-        // Salva le modifiche
-        $exam->update($input);
+        $exam->update($request->validated());
 
         // Reindirizza con un messaggio di successo
         return redirect()->route('exam.edit', $id)->with('success', 'Exam updated successfully.');
