@@ -1,10 +1,15 @@
 # Ambiente di sviluppo MEXAM.
 #
-#   docker compose up -d --build          app su http://localhost
-#   docker compose --profile dev up node  Vite in HMR su :5173
-#   docker compose --profile tools up -d  phpMyAdmin su :8081
+#   docker compose up -d --build          app su http://localhost:8088
+#   docker compose --profile dev up node  Vite in HMR su :5273
+#                                         phpMyAdmin su :8181
 #
 # Le credenziali arrivano da .env (prima erano root/root hardcoded qui dentro).
+#
+# Nessun `container_name`: fissarlo impedisce a VS Code Dev Containers di
+# ricreare i container sotto il proprio progetto compose, e la rebuild resta
+# appesa a ritentare invece di fallire. I servizi si raggiungono comunque per
+# nome di servizio (nginx punta ad `app:9000`).
 
 name: mexam
 
@@ -18,7 +23,6 @@ services:
         UID: ${UID:-1000}
         GID: ${GID:-1000}
     image: mexam/app:dev
-    container_name: mexam-app
     restart: unless-stopped
     working_dir: /var/www
     volumes:
@@ -39,7 +43,6 @@ services:
 
   webserver:
     image: nginx:1.27-alpine
-    container_name: mexam-nginx
     restart: unless-stopped
     ports:
       - "${APP_PORT:-8088}:80"
@@ -52,7 +55,6 @@ services:
   db:
     # mysql:5.7.22 era EOL da ottobre 2023
     image: mysql:8.0
-    container_name: mexam-db
     restart: unless-stopped
     ports:
       - "${DB_PORT_HOST:-33061}:3306"
@@ -75,8 +77,9 @@ services:
   # Vite in watch mode. Non parte di default: l'app funziona con gli asset
   # gia' compilati, questo serve solo mentre si lavora sul frontend.
   node:
-    image: node:20-alpine
-    container_name: mexam-node
+    # Allineata al NODE_VERSION del Dockerfile: vite 8 (Step F1) richiede
+    # Node ^20.19 o >=22.12, e 20 e' gia' EOL.
+    image: node:22-alpine
     working_dir: /app
     volumes:
       - ./:/app
@@ -94,7 +97,6 @@ services:
   # Interfaccia di amministrazione del database.
   phpmyadmin:
     image: phpmyadmin:5
-    container_name: mexam-phpmyadmin
     restart: unless-stopped
     ports:
       - "${PMA_PORT:-8181}:80"

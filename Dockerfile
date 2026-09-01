@@ -20,7 +20,9 @@
 # Project Doc, nota su Symfony 8). Verificare la disponibilita' di PHP 8.4
 # sull'hosting di destinazione prima del deploy (Step D1).
 ARG PHP_VERSION=8.4
-ARG NODE_VERSION=20
+# vite 8 (Fase 2, Step F1) richiede Node ^20.19 o >=22.12: 20 e' gia' EOL,
+# quindi 22 LTS invece di limitarsi alla patch minima che soddisfa il vincolo.
+ARG NODE_VERSION=22
 
 # ---------------------------------------------------------------------------
 # Stage: assets — build Vite
@@ -32,7 +34,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
-COPY vite.config.js ./
+COPY vite.config.ts ./
 COPY resources ./resources
 RUN npm run build
 

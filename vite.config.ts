@@ -1,15 +1,24 @@
-import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 import laravel from 'laravel-vite-plugin';
+import { defineConfig } from 'vite';
 
 export default defineConfig({
     plugins: [
         laravel({
             input: [
+                // Blade + Bootstrap: ancora la maggior parte delle view finche'
+                // non finisce lo Step F2. Coesiste con l'entry Inertia sotto.
                 'resources/sass/app.scss',
                 'resources/js/app.js',
+                // Inertia + React (Fase 2, Step F1).
+                'resources/css/app.css',
+                'resources/js/app.tsx',
             ],
             refresh: true,
         }),
+        react(),
+        tailwindcss(),
     ],
     // Necessario per l'HMR dal container `node`: senza host 0.0.0.0 il dev
     // server ascolta solo sul loopback interno e il browser non lo raggiunge.

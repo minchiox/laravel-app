@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use Inertia\Inertia;
 
 class CustomAuthController extends Controller
 {
@@ -80,7 +81,7 @@ class CustomAuthController extends Controller
 
     public function dashboard()
     {
-        return view('auth.dashboard');
+        return Inertia::render('dashboard');
     }
 
     public function signOut(Request $request)
