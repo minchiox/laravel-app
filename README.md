@@ -52,15 +52,16 @@ studente puo' aprirlo e consegnarlo subito), **non ancora iniziato** (Informatic
 ### Con il devcontainer (consigliato)
 
 Apri la cartella in VS Code e scegli **Reopen in Container**: l'editor si collega al container `app`
-gia' in esecuzione, con PHP, Composer, le estensioni e il codice montato in `/var/www`. Il terminale
-integrato e' dentro il container, quindi `php artisan ...`, `composer ...` e `vendor/bin/phpunit`
-funzionano direttamente, senza `make` ne' `docker compose exec`.
+gia' in esecuzione, con PHP, Composer, Node (via una feature del devcontainer, non nel Dockerfile —
+non appesantisce l'immagine di produzione) e il codice montato in `/var/www`. Il terminale integrato
+e' dentro il container, quindi `php artisan ...`, `composer ...`, `vendor/bin/phpunit`, `npm run dev`
+e `npx tsc --noEmit` funzionano tutti direttamente, senza `make` ne' un secondo terminale.
 
 **`make` e Docker no**: il container `app` non ha il CLI Docker (ne' l'accesso al socket dell'host),
-quindi qualunque comando che parte da `docker compose` — tutto il `Makefile`, `make dev` compreso —
-da quel terminale fallisce con `docker: No such file or directory`. Per Node/Vite (il servizio `app`
-non lo ha installato) e per qualunque `make ...` serve un **secondo terminale sull'host**, fuori da VS
-Code Dev Containers: vedi la sezione seguente.
+quindi qualunque comando che parte da `docker compose` — tutto il `Makefile` — da quel terminale
+fallisce con `docker: No such file or directory`. Per quello (avviare/fermare i container, `make
+fresh`, ecc.) serve un terminale sull'host, fuori da VS Code Dev Containers: vedi la sezione seguente.
+Per lavorare su PHP e frontend, pero', non serve mai uscire dal terminale del devcontainer.
 
 ### Con Docker da terminale
 
@@ -89,26 +90,29 @@ docker compose exec app vendor/bin/phpunit
 ### Frontend
 
 Gli asset compilati sono gia' dentro l'immagine, quindi l'app funziona appena avviata. Per lavorare
-sul CSS/JS con hot reload serve il servizio Vite:
+sul CSS/JS con hot reload serve Vite in watch mode.
+
+**Nel devcontainer** (Node e' li' dentro, vedi sopra): direttamente nel terminale integrato,
+`git pull` compreso — se il commit ha aggiornato le dipendenze JS (come lo Step 16, che ha introdotto
+Ziggy e i pacchetti Radix mancanti), un `npm install` prima basta.
 
 ```bash
-make dev           # oppure: docker compose --profile dev up node
+npm install       # solo se package.json e' cambiato
+npm run dev       # Vite in hot reload, porta gia' forwardata dal devcontainer
+npx tsc --noEmit  # controllo dei tipi, senza tenere Vite acceso
 ```
 
-`make dev` esegue `npm install` a ogni avvio (vedi `command:` del servizio `node` in
-`docker-compose.yml`): dopo aver tirato giu' commit che aggiungono o aggiornano dipendenze JS (come
-lo Step 16, che ha introdotto Ziggy e i pacchetti Radix mancanti) basta rilanciarlo, non serve nessun
-`npm install` manuale ne' un rebuild dell'immagine `app`.
-
-L'intera SPA (tutte le pagine tranne la stampa PDF) e' React 19 + TypeScript. Per un controllo dei
-tipi senza tenere Vite in esecuzione:
+**Da un terminale sull'host** (non devcontainer, vedi sotto): stesso risultato via il servizio `node`
+del compose, con `make`:
 
 ```bash
-make types         # tsc --noEmit dentro il servizio node
+make dev    # oppure: docker compose --profile dev up node — esegue npm install a ogni avvio
+make types  # tsc --noEmit dentro il servizio node
 ```
 
-Non e' ancora agganciato alla CI (`vendor/bin/phpunit` e' l'unico step in `.github/workflows/tests.yml`
-al momento): lanciarlo a mano prima di aprire una PR che tocca `resources/js/`.
+Nessuno dei due e' ancora agganciato alla CI (`vendor/bin/phpunit` e' l'unico step in
+`.github/workflows/tests.yml` al momento): lanciare il type-check a mano prima di aprire una PR che
+tocca `resources/js/`.
 
 ### Porte
 

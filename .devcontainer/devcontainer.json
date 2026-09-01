@@ -18,11 +18,31 @@
 
     "remoteUser": "www",
 
-    // NIENTE forwardPorts.
+    // Node solo qui dentro (layer aggiunto dal Dev Containers CLI *sopra*
+    // l'immagine `app`, mai nel Dockerfile: il servizio `node` del compose e
+    // l'immagine di produzione restano come prima). Serve perche' dentro
+    // questo container non c'e' il CLI Docker (ne' l'accesso al socket
+    // dell'host): senza Node qui, l'unico modo per lanciare Vite era un
+    // secondo terminale sull'host per pilotare il servizio `node` via
+    // `docker compose`/`make dev` — scomodo e per niente ovvio.
+    "features": {
+        "ghcr.io/devcontainers/features/node:1": { "version": "22" }
+    },
+
+    // A differenza di 8088/8181/33061 (che stanno in altri container e vanno
+    // dichiarati come numeri nudi, come spiegato sotto), 5273 qui ha senso
+    // forwardarla: e' Vite ad ascoltarci, dentro *questo* container, una
+    // volta lanciato npm run dev.
+    "forwardPorts": [5273],
+    "portsAttributes": {
+        "5273": { "label": "Vite (npm run dev)" }
+    },
+
+    // NIENTE altre forwardPorts.
     // I numeri nudi si riferiscono al container primario (`app`), che ascolta
-    // solo su 9000: dichiarare 8088/8181/33061 faceva ritentare a vuoto
-    // l'inoltro di porte su cui, in quel container, non ascolta nessuno.
-    // Le porte sono gia' pubblicate sull'host dal compose:
+    // solo su 9000 (e ora anche 5273, vedi sopra): dichiarare 8088/8181/33061
+    // faceva ritentare a vuoto l'inoltro di porte su cui, in quel container,
+    // non ascolta nessuno. Le porte sono gia' pubblicate sull'host dal compose:
     //   app  http://localhost:8088     phpMyAdmin  http://localhost:8181
     //   db   127.0.0.1:33061
 
@@ -54,6 +74,10 @@
     },
 
     // L'ENTRYPOINT del container ha gia' fatto composer install, migrazioni e
-    // seed: qui basta assicurarsi che le dipendenze di sviluppo ci siano.
-    "postCreateCommand": "composer install --no-interaction"
+    // seed: qui basta assicurarsi che le dipendenze di sviluppo (PHP e, ora
+    // che c'e' Node, anche JS) ci siano. node_modules finisce nel volume
+    // anonimo gia' dichiarato su questo servizio in docker-compose.yml, non
+    // sul bind mount: i binari compilati restano per Linux, non si mescolano
+    // con quelli di un eventuale `npm install` fatto sull'host.
+    "postCreateCommand": "composer install --no-interaction && npm install"
 }
