@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreLibraryRequest;
 use App\Http\Requests\UpdateLibraryRequest;
 use App\Models\Library;
+use Inertia\Inertia;
 
 class LibraryController extends Controller
 {
     public function index()
     {
-        return view('library.library');
+        return Inertia::render('library/create');
     }
 
     public function store(StoreLibraryRequest $request)
@@ -20,7 +21,7 @@ class LibraryController extends Controller
         $library->user_id = auth()->id();
         $library->save();
 
-        return back()->with('success', 'Library added successfully.');
+        return back()->with('success', 'Libreria aggiunta con successo.');
     }
 
     public function destroy($id)
@@ -30,7 +31,7 @@ class LibraryController extends Controller
         $library->delete();
 
         // Reindirizza con un messaggio di successo
-        return redirect()->route('libraryquiz.list')->with('success', 'Library deleted successfully.');
+        return redirect()->route('libraryquiz.list')->with('success', 'Libreria eliminata con successo.');
     }
 
     public function edit($id)
@@ -38,7 +39,7 @@ class LibraryController extends Controller
         $library = Library::findOrFail($id);
         $this->authorize('update', $library);
 
-        return view('library.edit', compact('library'));
+        return Inertia::render('library/edit', compact('library'));
     }
 
     public function update(UpdateLibraryRequest $request, $id)
@@ -48,7 +49,7 @@ class LibraryController extends Controller
         $library->update($request->validated());
 
         // Reindirizza con un messaggio di successo
-        return redirect()->route('library.edit', $id)->with('success', 'Library updated successfully.');
+        return redirect()->route('library.edit', $id)->with('success', 'Libreria aggiornata con successo.');
     }
 
 }
