@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\CorrectAnswerRequest;
 use App\Models\Exam;
 use App\Models\Quiz;
 use App\Models\Library;
@@ -154,7 +155,7 @@ class ExamQuizController extends Controller
 
     public function indexingResults($examId)
     {
-        $exam = Exam::find($examId);
+        $exam = Exam::findOrFail($examId);
         $users= $exam->user()->get();
 
         return view('exam.results', compact('exam','users'));
@@ -162,7 +163,7 @@ class ExamQuizController extends Controller
 
     public function displayUsersAnswer($userId, $examId){
 
-        $exam = Exam::find($examId);
+        $exam = Exam::findOrFail($examId);
         $quizzes = $exam->quiz()->get()->pluck('id');
 
         $userAnswer = UserAnswer::where('user_id', $userId)
@@ -182,10 +183,11 @@ class ExamQuizController extends Controller
      * precedente invece di azzerarlo: ricorreggere un compito dopo aver
      * cambiato la risposta giusta di un quiz non riduceva mai il punteggio.
      */
-    public function correctAnswer(Request $request)
+    public function correctAnswer(CorrectAnswerRequest $request)
     {
-        $examId = $request->input('exam_id');
-        $userId = $request->input('user_id');
+        $validated = $request->validated();
+        $examId = $validated['exam_id'];
+        $userId = $validated['user_id'];
 
         $studentAnswers = UserAnswer::where('exam_id', $examId)
             ->where('user_id', $userId)
@@ -220,16 +222,13 @@ class ExamQuizController extends Controller
 
     public function printExamUser($examId, $userId)
     {
-        // Recupera l'esame dal database
-        $exam = Exam::find($examId);
+        // find() lasciava passare un id inesistente fino a $user->name,
+        // un errore fatale invece di un 404 pulito.
+        $exam = Exam::findOrFail($examId);
+        $user = User::findOrFail($userId);
         $userAnswer = UserAnswer::where('user_id', $userId)
             ->where('exam_id', $examId)
             ->get();
-        $user = User::find($userId);
-        // Controlla se l'esame esiste
-        if (!$exam) {
-            return back()->with('error', "L'esame non è stato trovato");
-        }
         //per stampare il nome dello studente che ha svolto l'esame
         $user = $user->name;
         $quizzes = $exam->quiz()->get();
@@ -248,13 +247,7 @@ class ExamQuizController extends Controller
 
     public function printExam($examId)
     {
-        // Recupera l'esame dal database
-        $exam = Exam::find($examId);
-
-        // Controlla se l'esame esiste
-        if (!$exam) {
-            return back()->with('error', "L'esame non è stato trovato");
-        }
+        $exam = Exam::findOrFail($examId);
         $quizzes = $exam->quiz()->inRandomOrder()->get();
         $filename = "esame_{$examId}_in_bianco.pdf";
 

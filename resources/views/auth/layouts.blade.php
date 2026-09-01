@@ -27,7 +27,9 @@
                 @else
                     <li class="nav-item dropdown mt-2">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle " href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
-                            <img src="/avatars/{{ Auth::user()->avatar }}" style="width: 30px; border-radius: 10%">
+                            @if (Auth::user()->avatar)
+                                <img src="{{ route('user.avatar', Auth::user()->avatar) }}" style="width: 30px; border-radius: 10%">
+                            @endif
                             {{ Auth::user()->name }}
                         </a>
 

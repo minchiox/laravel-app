@@ -146,3 +146,15 @@ correzione.
   `composer install`, migrazioni e seed.
 - **Su Linux**: allinea `UID`/`GID` in `.env` al tuo utente (`id -u`, `id -g`) per non ritrovarti
   file root-owned nel repo. Su macOS lasciali invariati.
+
+---
+
+## Deploy pubblico
+
+`.env.example` e' pensato per lo sviluppo locale (`APP_DEBUG=true` e' corretto li', l'ambiente non e'
+raggiungibile da Internet). Per un deploy su dominio pubblico parti invece da `.env.production.example`,
+che imposta `APP_DEBUG=false`, cookie di sessione solo su HTTPS e gli altri default di produzione, e
+compila i placeholder (database, mail, eventuali proxy davanti all'app).
+
+Non usare il `docker-compose.yml` di questo repo cosi' com'e' per un deploy pubblico: espone la porta
+MySQL sull'host e pubblica phpMyAdmin, entrambi pensati solo per lo sviluppo locale.

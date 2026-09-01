@@ -57,7 +57,16 @@ Route::middleware('auth')->group(function () {
     Route::get('dashboard', [CustomAuthController::class, 'dashboard'])->name('dashboard');
 
     Route::get('/profile', [ProfileController::class, 'index'])->name('user.profile');
-    Route::post('/profile', [ProfileController::class, 'store'])->name('user.profile.store');
+    Route::post('/profile', [ProfileController::class, 'store'])
+        ->middleware('throttle:10,1')
+        ->name('user.profile.store');
+
+    // Serve l'avatar da storage/app (fuori dalla webroot): {filename} e' il
+    // nome generato da hashName(), quindi il pattern esclude a monte
+    // path traversal e caratteri fuori da quelli che il framework genera.
+    Route::get('/avatars/{filename}', [ProfileController::class, 'avatar'])
+        ->where('filename', '[A-Za-z0-9]+\.[A-Za-z0-9]+')
+        ->name('user.avatar');
 
     // Elenchi in sola lettura. Prima erano senza alcun middleware: le view
     // eseguono Auth::user()->isTeacher, quindi un visitatore non autenticato
@@ -67,7 +76,9 @@ Route::middleware('auth')->group(function () {
 
     // Svolgimento dell'esame da parte dello studente.
     Route::get('/exam/{id}', [ExamQuizController::class, 'access'])->name('exam.access');
-    Route::post('/exam/sendAnswer', [ExamQuizController::class, 'storeUserAnswers'])->name('store.user.answer');
+    Route::post('/exam/sendAnswer', [ExamQuizController::class, 'storeUserAnswers'])
+        ->middleware('throttle:10,1')
+        ->name('store.user.answer');
 });
 
 /*
@@ -130,10 +141,16 @@ Route::middleware(['auth', 'isTeacher'])->group(function () {
     // leggeva, stampava e perfino rivalutava il compito di chiunque altro.
     Route::get('/exam/results/{id}', [ExamQuizController::class, 'indexingResults'])->name('show.users.results.index');
     Route::get('/exam/results/user/{iduser}/{idexam}', [ExamQuizController::class, 'displayUsersAnswer'])->name('display.users.answer');
-    Route::get('/examcorrect', [ExamQuizController::class, 'correctAnswer'])->name('display.users.answerF');
-    Route::post('/examcorrect', [ExamQuizController::class, 'correctAnswer'])->name('display.users.answerP');
+    // La versione GET permetteva di rivalutare un esame aprendo un link o
+    // caricando un'immagine ostile: le GET non passano dal controllo CSRF.
+    // La view usa gia' solo la POST gemella qui sotto.
+    Route::post('/examcorrect', [ExamQuizController::class, 'correctAnswer'])
+        ->middleware('throttle:30,1')
+        ->name('display.users.answerP');
 
     // --- Stampa -------------------------------------------------------
-    Route::get('/printexam/{idexam}/{iduser}', [ExamQuizController::class, 'printExamUser'])->name('print.exam');
-    Route::get('/printexam/{idexam}', [ExamQuizController::class, 'printExam'])->name('print.blankexam');
+    Route::middleware('throttle:20,1')->group(function () {
+        Route::get('/printexam/{idexam}/{iduser}', [ExamQuizController::class, 'printExamUser'])->name('print.exam');
+        Route::get('/printexam/{idexam}', [ExamQuizController::class, 'printExam'])->name('print.blankexam');
+    });
 });
