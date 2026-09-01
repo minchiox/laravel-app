@@ -52,9 +52,11 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
             ],
-            // Non c'e' ancora Ziggy/wayfinder: finche' la nav React collega
-            // solo pagine Blade, le poche URL che le servono bastano cosi'.
-            // Da rivedere se il numero cresce parecchio durante lo Step F2.
+            // Step F2: Ziggy e' stato introdotto per i link con parametro
+            // (route() lato JS, via @routes in app.blade.php). Questa mappa
+            // resta solo per il pugno di link senza parametri gia' in uso
+            // dalla nav condivisa: per tutto il resto le pagine usano
+            // direttamente route() di Ziggy.
             'nav' => [
                 'login' => route('login'),
                 'register' => route('register'),
@@ -64,10 +66,8 @@ class HandleInertiaRequests extends Middleware
                 'quizList' => route('quiz.list'),
                 'quizCreate' => route('quiz.create'),
                 'libraryCreate' => route('library.library'),
-                'libraryAddQuiz' => route('libraryquiz.index'),
                 'libraryList' => route('libraryquiz.list'),
                 'examCreate' => route('exam.index'),
-                'examAddQuiz' => route('examquiz.index'),
                 'examList' => route('exam.list'),
             ],
         ];

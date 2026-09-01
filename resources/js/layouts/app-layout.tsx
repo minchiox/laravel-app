@@ -1,6 +1,8 @@
 import { router } from '@inertiajs/react';
+import { ChevronDownIcon } from 'lucide-react';
 import type { PropsWithChildren } from 'react';
 
+import FlashAlerts from '@/components/flash-alerts';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
     DropdownMenu,
@@ -10,14 +12,27 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import type { AuthUser, Nav } from '@/types';
+import type { AuthUser, Nav, SharedPageProps } from '@/types';
 
 interface AppLayoutProps {
     user: AuthUser;
     nav: Nav;
+    flash: SharedPageProps['flash'];
 }
 
-export default function AppLayout({ user, nav, children }: PropsWithChildren<AppLayoutProps>) {
+function NavMenu({ label, children }: PropsWithChildren<{ label: string }>) {
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center gap-1 text-muted-foreground outline-none hover:text-foreground focus-visible:text-foreground">
+                {label}
+                <ChevronDownIcon className="size-3.5" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">{children}</DropdownMenuContent>
+        </DropdownMenu>
+    );
+}
+
+export default function AppLayout({ user, nav, flash, children }: PropsWithChildren<AppLayoutProps>) {
     return (
         <div className="min-h-screen bg-background">
             <header className="border-b">
@@ -28,24 +43,43 @@ export default function AppLayout({ user, nav, children }: PropsWithChildren<App
 
                     <nav className="flex items-center gap-6 text-sm">
                         {user.isTeacher && (
-                            <>
-                                <a href={nav.quizList} className="text-muted-foreground hover:text-foreground">
-                                    Quiz
-                                </a>
-                                <a href={nav.libraryCreate} className="text-muted-foreground hover:text-foreground">
-                                    Librerie
-                                </a>
-                                <a href={nav.examCreate} className="text-muted-foreground hover:text-foreground">
-                                    Esami
-                                </a>
-                            </>
+                            <NavMenu label="Quiz">
+                                <DropdownMenuItem asChild>
+                                    <a href={nav.quizList}>Elenco quiz</a>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                    <a href={nav.quizCreate}>Crea quiz</a>
+                                </DropdownMenuItem>
+                            </NavMenu>
                         )}
-                        <a href={nav.libraryList} className="text-muted-foreground hover:text-foreground">
-                            Elenco librerie
-                        </a>
-                        <a href={nav.examList} className="text-muted-foreground hover:text-foreground">
-                            Elenco esami
-                        </a>
+
+                        <NavMenu label="Librerie">
+                            {user.isTeacher && (
+                                <>
+                                    <DropdownMenuItem asChild>
+                                        <a href={nav.libraryCreate}>Crea libreria</a>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                </>
+                            )}
+                            <DropdownMenuItem asChild>
+                                <a href={nav.libraryList}>Elenco librerie</a>
+                            </DropdownMenuItem>
+                        </NavMenu>
+
+                        <NavMenu label="Esami">
+                            {user.isTeacher && (
+                                <>
+                                    <DropdownMenuItem asChild>
+                                        <a href={nav.examCreate}>Crea esame</a>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                </>
+                            )}
+                            <DropdownMenuItem asChild>
+                                <a href={nav.examList}>Elenco esami</a>
+                            </DropdownMenuItem>
+                        </NavMenu>
 
                         <DropdownMenu>
                             <DropdownMenuTrigger className="flex items-center gap-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring">
@@ -72,7 +106,10 @@ export default function AppLayout({ user, nav, children }: PropsWithChildren<App
                 </div>
             </header>
 
-            <main className="mx-auto max-w-5xl px-6 py-8">{children}</main>
+            <main className="mx-auto max-w-5xl px-6 py-8">
+                <FlashAlerts flash={flash} />
+                {children}
+            </main>
         </div>
     );
 }

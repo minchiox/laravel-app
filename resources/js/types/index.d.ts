@@ -15,10 +15,8 @@ export interface Nav {
     quizList: string;
     quizCreate: string;
     libraryCreate: string;
-    libraryAddQuiz: string;
     libraryList: string;
     examCreate: string;
-    examAddQuiz: string;
     examList: string;
 }
 

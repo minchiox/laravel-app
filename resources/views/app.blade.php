@@ -6,6 +6,7 @@
 
     <title inertia>{{ config('app.name', 'MEXAM') }}</title>
 
+    @routes
     @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/app.tsx'])
     @inertiaHead

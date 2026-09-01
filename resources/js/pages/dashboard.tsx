@@ -9,19 +9,8 @@ export default function Dashboard({ auth, nav, flash }: SharedPageProps) {
     const user = auth.user!;
 
     return (
-        <AppLayout user={user} nav={nav}>
+        <AppLayout user={user} nav={nav} flash={flash}>
             <Head title="Dashboard" />
-
-            {flash.success && (
-                <div className="mb-6 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-200">
-                    {flash.success}
-                </div>
-            )}
-            {flash.error && (
-                <div className="mb-6 rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-                    {flash.error}
-                </div>
-            )}
 
             <h1 className="mb-1 text-2xl font-semibold tracking-tight">Ciao, {user.name}</h1>
             <p className="mb-8 text-muted-foreground">
