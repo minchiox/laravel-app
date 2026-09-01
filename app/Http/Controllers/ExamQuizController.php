@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Models\Exam;
 use App\Models\Quiz;
 use App\Models\Library;
@@ -70,58 +71,81 @@ class ExamQuizController extends Controller
         return view('exam.quizlist', ['quizzes' => $quizzes]);
     }
 
+    /**
+     * Apre l'esame per lo studente.
+     *
+     * Prima l'iscrizione avveniva qui, all'apertura: bastava chiudere la pagina
+     * per restare esclusi dall'esame per sempre. Ora aprire e' un'operazione di
+     * sola lettura e l'iscrizione avviene alla consegna.
+     */
     public function access($examId)
     {
-        $exam = Exam::find($examId);
-        $now = now();
-        if ($now < $exam->startAt || $now > $exam->dueAt) {
-            return redirect()->back()->with('error', 'L\'esame non è al momento disponibile.');
+        $exam = Exam::findOrFail($examId);
+
+        if (! $exam->isOpen()) {
+            return redirect()->route('exam.list')
+                ->with('error', "L'esame non e' al momento disponibile.");
         }
 
-        $user = Auth::user();
-        if ($exam->user()->where('user_id', $user->id)->exists()) {
-            return redirect()->back()->with('error', 'Hai già partecipato a questo esame.');
+        if ($exam->wasSubmittedBy(Auth::id())) {
+            return redirect()->route('exam.list')
+                ->with('error', 'Hai gia\' consegnato questo esame.');
         }
 
-        $quizzes = $exam->quiz()->inRandomOrder()->get();
-
-        $exam->user()->attach($user->id);
-        return view('exam.access', compact('quizzes','exam'));
+        return view('exam.access', [
+            'exam' => $exam,
+            'quizzes' => $exam->quiz()->inRandomOrder()->get(),
+        ]);
     }
 
+    /**
+     * Registra la consegna.
+     *
+     * La versione precedente non validava nulla, non controllava la finestra
+     * temporale, non impediva la seconda consegna e iterava su Quiz::all(),
+     * cioe' su tutti i quiz del sistema invece che su quelli dell'esame.
+     */
     public function storeUserAnswers(Request $request)
     {
-        $examid = $request->input('exam_id');
+        $validated = $request->validate([
+            'exam_id' => ['required', 'integer', 'exists:exams,id'],
+        ]);
 
-        $quizzes = Quiz::all();
-        foreach ($quizzes as $quiz) {
-            $quizId = $quiz->id;
+        $exam = Exam::with('quiz')->findOrFail($validated['exam_id']);
+        $userId = Auth::id();
 
-            // Check if the answer is submitted as a radio button or a text input
-            if ($request->has('answer' . $quizId)) {
-                // If it's a radio button answer
-                $answer = $request->input('answer' . $quizId);
-                $answer_text=null;
-            } elseif ($request->has('answer_text' . $quizId)) {
-                // If it's a text input answer
-                $answer_text = $request->input('answer_text' . $quizId);
-                $answer = null;
-            } else {
-                // Handle the case if no answer is submitted for the quiz
-                continue; // Skip this quiz and move to the next one
+        abort_unless($exam->isOpen(), 403, "L'esame non e' al momento disponibile.");
+        abort_if($exam->wasSubmittedBy($userId), 403, 'Esame gia\' consegnato.');
+
+        // Una sola transazione: se qualcosa fallisce a meta', non resta una
+        // consegna parziale.
+        DB::transaction(function () use ($exam, $userId, $request) {
+            foreach ($exam->quiz as $quiz) {
+                $answer = $request->input('answer'.$quiz->id);
+                $answerText = $request->input('answer_text'.$quiz->id);
+
+                if ($answer === null && $answerText === null) {
+                    continue;
+                }
+
+                UserAnswer::create([
+                    'user_id' => $userId,
+                    'exam_id' => $exam->id,
+                    'quiz_id' => $quiz->id,
+                    'answer' => $answer === null ? null : (bool) $answer,
+                    'answer_text' => $answerText,
+                ]);
             }
 
-            // Now you have the $quizId and $answer, you can save them to the database
-            $userAnswer = new UserAnswer();
-            $userAnswer->user_id = auth()->id();
-            $userAnswer->quiz_id = $quizId;
-            $userAnswer->answer = $answer;
-            $userAnswer->answer_text = $answer_text;
-            $userAnswer->exam_id = $examid;
-            $userAnswer->save();
-        }
+            // L'iscrizione avviene qui: e' la consegna a segnare la
+            // partecipazione. L'indice unico su (exam_id, user_id) impedisce
+            // il doppio invio anche in caso di richieste concorrenti.
+            $exam->user()->attach($userId, ['created_at' => now(), 'updated_at' => now()]);
+        });
 
-        return view('auth.dashboard')->with('success', 'L\'esame è stato consegnato correttamente.');
+        // Prima restituiva direttamente la view: un refresh rispediva il POST.
+        return redirect()->route('dashboard')
+            ->with('success', "L'esame e' stato consegnato correttamente.");
     }
 
     public function indexingResults($examId)
@@ -212,28 +236,18 @@ class ExamQuizController extends Controller
         }
         //per stampare il nome dello studente che ha svolto l'esame
         $user = $user->name;
-        // Recupera le domande dell'esame
-        //$quizzes = $exam->quizzes;
         $quizzes = $exam->quiz()->get();
-        // Genera il nome del file PDF
-        $filename = 'exam_' . $examId . '.pdf';
 
-        // Crea il documento PDF utilizzando la libreria Laravel PDF
-        $pdf = PDF::loadView('exam.printResult', compact('exam', 'quizzes', 'userId', 'userAnswer','user'));
+        // Il nome includeva solo l'id dell'esame, quindi il compito di uno
+        // studente sovrascriveva quello di un altro.
+        $filename = "esame_{$examId}_studente_{$userId}.pdf";
 
-        // Opzionalmente, puoi personalizzare l'output del PDF
-        // $pdf->setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif']);
+        $pdf = PDF::loadView('exam.printResult', compact('exam', 'quizzes', 'userId', 'userAnswer', 'user'));
 
-        // Salva il PDF sul server
-        $pdf->save(public_path('pdf/' . $filename));
-
-        // Ritorna la risposta HTTP con il PDF allegato
-        $response = response($pdf->output())
-            ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'inline; filename="' . $filename . '"');
-
-        // Ritorna alla pagina precedente con un messaggio di successo
-        return response($pdf->output())->header('Content-Type', 'application/pdf')->header('Content-Disposition', 'inline; filename="' . $filename . '"');
+        // Il PDF veniva salvato in public/pdf/ con un nome prevedibile: i
+        // compiti svolti erano scaricabili da chiunque, senza autenticazione.
+        // Ora viene solo trasmesso al docente che lo ha richiesto.
+        return $pdf->stream($filename);
     }
 
     public function printExam($examId)
@@ -245,27 +259,14 @@ class ExamQuizController extends Controller
         if (!$exam) {
             return back()->with('error', "L'esame non è stato trovato");
         }
-        // Recupera le domande dell'esame
         $quizzes = $exam->quiz()->inRandomOrder()->get();
-        // Genera il nome del file PDF
-        $filename = 'blankexam_' . $examId . '.pdf';
+        $filename = "esame_{$examId}_in_bianco.pdf";
 
-        // Crea il documento PDF utilizzando la libreria Laravel PDF
         $pdf = PDF::loadView('exam.printResultBlank', compact('exam', 'quizzes'));
 
-        // Opzionalmente, puoi personalizzare l'output del PDF
-        // $pdf->setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif']);
-
-        // Salva il PDF sul server
-        $pdf->save(public_path('pdf/' . $filename));
-
-        // Ritorna la risposta HTTP con il PDF allegato
-        $response = response($pdf->output())
-            ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'inline; filename="' . $filename . '"');
-
-        // Ritorna alla pagina precedente con un messaggio di successo
-        return response($pdf->output())->header('Content-Type', 'application/pdf')->header('Content-Disposition', 'inline; filename="' . $filename . '"');
+        // Anche qui il salvataggio in public/ rendeva le tracce d'esame
+        // scaricabili in anticipo da chiunque conoscesse l'id.
+        return $pdf->stream($filename);
     }
 
 

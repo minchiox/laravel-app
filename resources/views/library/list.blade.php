@@ -31,8 +31,9 @@
                                 <td>{{ $library->created_at }}</td>
 
                                 <td>
-                                    <a href="{{ route ('library.quiz', $library->id) }}" class="btn btn-primary">{{ __('Quiz') }}</a>
                                     @if(Auth::user()->isTeacher)
+                                    {{-- Anche l'elenco quiz di una libreria espone le risposte corrette. --}}
+                                    <a href="{{ route ('library.quiz', $library->id) }}" class="btn btn-primary">{{ __('Quiz') }}</a>
                                     <a href="{{ route ('library.edit', $library->id) }}" class="btn btn-primary">{{ __('Edit') }}</a>
 
                                     <form action="{{ route('library.destroy', $library->id) }}" method="POST" style="display: inline;">

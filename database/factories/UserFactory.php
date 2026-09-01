@@ -16,11 +16,6 @@ class UserFactory extends Factory
      */
     protected static ?string $password;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
@@ -28,9 +23,21 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
-            'isTeacher' => fake()->boolean(),
+            // era fake()->boolean(): il ruolo veniva estratto a caso, quindi i
+            // test e la demo non sapevano mai chi fosse docente
+            'isTeacher' => false,
             'remember_token' => Str::random(10),
         ];
+    }
+
+    public function teacher(): static
+    {
+        return $this->state(fn () => ['isTeacher' => true]);
+    }
+
+    public function student(): static
+    {
+        return $this->state(fn () => ['isTeacher' => false]);
     }
 
     /**

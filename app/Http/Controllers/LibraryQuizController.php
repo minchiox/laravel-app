@@ -65,13 +65,21 @@ class LibraryQuizController extends Controller
         return view('library.quizlist', ['quizzes' => $quizzes]);
     }
 
+    /**
+     * Alimenta la tabella di scelta quiz nella pagina "Add Quiz to Exam".
+     *
+     * Restituiva l'intero model, quindi anche `answer` e `answer_text`: le
+     * risposte corrette erano scaricabili da qualunque utente autenticato.
+     * Oltre al $hidden sul model, qui si selezionano esplicitamente le sole
+     * colonne che servono alla tabella.
+     */
     public function getQuizzes($libraryId)
     {
-        // Fetch quizzes associated with the selected library
-        $library = Library::find($libraryId);
-        $quizzes = $library->quiz()->get();
+        $library = Library::findOrFail($libraryId);
 
-        return response()->json($quizzes);
+        return response()->json(
+            $library->quiz()->get(['quizzes.id', 'question', 'subject', 'difficulty', 'points'])
+        );
     }
 
 }

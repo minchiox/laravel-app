@@ -1,11 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Http\Request;
-use Hash;
-use Session;
+
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class CustomAuthController extends Controller
 {
@@ -13,24 +13,37 @@ class CustomAuthController extends Controller
     {
         return view('auth.login');
     }
+
     public function customLogin(Request $request)
     {
         $request->validate([
-            'email' => 'required',
+            // era 'required' e basta: si poteva tentare il login con
+            // qualunque stringa
+            'email' => 'required|email',
             'password' => 'required',
         ]);
-        $credentials = $request->only('email', 'password');
-        if (Auth::attempt($credentials)) {
-            return redirect()->intended('dashboard')
-                ->withSuccess('Signed in');
+
+        if (! Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+            // Prima un login fallito faceva redirect('login')->withSuccess(...),
+            // cioe' comunicava un successo e non popolava $errors: la view
+            // mostrava una pagina di login muta.
+            return back()
+                ->withErrors(['email' => 'Credenziali non valide.'])
+                ->onlyInput('email');
         }
-        return redirect("login")->withSuccess('Login details are not valid');
+
+        // Senza rigenerazione l'id di sessione sopravvive all'autenticazione:
+        // e' la premessa della session fixation.
+        $request->session()->regenerate();
+
+        return redirect()->intended(route('dashboard'));
     }
+
     public function registration()
     {
-
         return view('auth.register');
     }
+
     public function customRegistration(Request $request)
     {
         $request->validate([
@@ -38,39 +51,44 @@ class CustomAuthController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
         ]);
-        $data = $request->all();
-        $data['isTeacher'] = $request->has('isTeacher');
-        $this->create($data);
-        $credentials = $request->only('email', 'password');
-        if (Auth::attempt($credentials)) {
-            return redirect()->intended('dashboard')->withSuccess('Signed in');
-        }
-        //return redirect("dashboard")->withSuccess('You have signed-in');
+
+        // Il ruolo non arriva piu' dal form: chiunque poteva registrarsi come
+        // docente spuntando una checkbox. Si assegna con
+        // `php artisan mexam:make-teacher <email>`.
+        $user = $this->create($request->only(['name', 'email', 'password']));
+
+        // Mancava il ramo else: se Auth::attempt falliva dopo aver creato
+        // l'utente, il metodo ritornava null e il browser riceveva una pagina
+        // vuota. Qui si autentica direttamente l'utente appena creato.
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        return redirect()->route('dashboard');
     }
-    public function create(array $data)
+
+    public function create(array $data): User
     {
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'isTeacher' => $data['isTeacher']
         ]);
     }
+
     public function dashboard()
     {
-        if (Auth::check()) {
-            return view('auth.dashboard');
-        }
-        return redirect("login")->withSuccess('You are not allowed to access.blade.php');
+        return view('auth.dashboard');
     }
-    public function signOut()
+
+    public function signOut(Request $request)
     {
-        Session::flush();
         Auth::logout();
-        return Redirect('login');
+
+        // Session::flush() svuotava i dati ma lasciava vivo l'id di sessione e
+        // il token CSRF.
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login');
     }
-
 }
-
-
-

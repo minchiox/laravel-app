@@ -47,8 +47,9 @@
                             {{ __('Quiz') }}
                         </a>
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <a href="{{ route('quiz.list') }}" class="dropdown-item">Quiz List</a>
+                            {{-- L'elenco quiz mostra le risposte corrette: e' riservato ai docenti. --}}
                             @if(Auth::user()->isTeacher)
+                            <a href="{{ route('quiz.list') }}" class="dropdown-item">Quiz List</a>
                             <a href="{{ route('quiz.create') }}" class="dropdown-item">Make Quiz</a>
                             @endif
                         </div>

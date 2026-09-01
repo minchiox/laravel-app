@@ -2,16 +2,22 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Quiz;
+use Database\Factories\QuizFactory;
+use Illuminate\Database\Seeder;
+
+/**
+ * Prima creava 50 quiz con materia `faker->word()`, cioe' 50 materie diverse:
+ * nessuna libreria o esame poteva raggrupparli in modo sensato.
+ * Ora i quiz sono distribuiti sulle materie condivise da tutta la demo.
+ */
 class QuizzesSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        Quiz::factory()->count(50)->create();
+        foreach (QuizFactory::SUBJECTS as $subject) {
+            Quiz::factory()->count(8)->closed()->subject($subject)->create();
+            Quiz::factory()->count(4)->open()->subject($subject)->create();
+        }
     }
 }

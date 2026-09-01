@@ -15,8 +15,12 @@ class User extends Authenticatable
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
-
+     * `isTeacher` e' volutamente escluso: era mass assignable e
+     * ProfileController salvava $request->all(), quindi bastava aggiungere
+     * isTeacher=1 al form del profilo per promuoversi docente.
+     * Il ruolo si assegna dal comando `php artisan mexam:make-teacher`.
+     *
+     * @var array<int, string>
      */
     protected $fillable = [
         'name',
@@ -25,7 +29,6 @@ class User extends Authenticatable
         'avatar',
         'phone',
         'city',
-        'isTeacher',
     ];
 
     /**
@@ -48,10 +51,13 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        // senza cast il valore arriva dal DB come 0/1 e per gli studenti
+        // registrati prima della colonna e' null
+        'isTeacher' => 'boolean',
     ];
 
     public function exam()
     {
-        return $this->belongsToMany(Exam::class, );
+        return $this->belongsToMany(Exam::class);
     }
 }
