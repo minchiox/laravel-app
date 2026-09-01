@@ -24,9 +24,14 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
+     *
+     * Il nome era al singolare ('user_answer'): dropIfExists non trovava
+     * nulla da fare e restituiva successo, ma la tabella reale (plurale,
+     * come in up()) restava con la sua foreign key verso quizzes, bloccando
+     * il rollback di create_quizzes_table.
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_answer');
+        Schema::dropIfExists('user_answers');
     }
 };
