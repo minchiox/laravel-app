@@ -7,11 +7,13 @@ export default defineConfig({
     plugins: [
         laravel({
             input: [
-                // Blade + Bootstrap: ancora la maggior parte delle view finche'
-                // non finisce lo Step F2. Coesiste con l'entry Inertia sotto.
+                // Blade + Bootstrap: lo Step F2 ha convertito tutte le pagine a
+                // Inertia+React, ma resta in vita per i due template di stampa
+                // PDF (resources/views/exam/printResult*.blade.php), gli unici
+                // ancora renderizzati via dompdf invece che dalla SPA.
                 'resources/sass/app.scss',
                 'resources/js/app.js',
-                // Inertia + React (Fase 2, Step F1).
+                // Inertia + React (Step F1-F2, tutta l'app tranne la stampa).
                 'resources/css/app.css',
                 'resources/js/app.tsx',
             ],

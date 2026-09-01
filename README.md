@@ -6,7 +6,7 @@ Un docente costruisce un archivio di domande (**quiz**), le raggruppa in **libre
 difficolta', e ne compone degli **esami** con una finestra temporale. Gli studenti svolgono l'esame
 online; il docente ne vede i risultati, li corregge e puo' stamparli in PDF.
 
-- **Stack**: PHP 8.2 · Laravel 10 · MySQL 8 · Blade + Bootstrap 5 · Vite
+- **Stack**: PHP 8.3 · Laravel 13 · MySQL 8 · Inertia.js + React 19 + Tailwind · Vite
 - **Ambiente**: Docker Compose, con devcontainer pronto per VS Code
 
 ---
@@ -120,7 +120,8 @@ app/Http/Controllers/    CustomAuth, Quiz, Library, LibraryQuiz, Exam, ExamQuiz,
 app/Models/              User, Quiz, Library, Exam, UserAnswer
 app/Http/Middleware/     IsTeacher, IsStudent
 database/seeders/        dataset di demo coerente (utenti, quiz, librerie, esami)
-resources/views/         Blade, layout in auth/layouts.blade.php
+resources/js/pages/      pagine React (Inertia), una per rotta; layout condiviso in layouts/app-layout.tsx
+resources/views/         solo il root Inertia (app.blade.php) e i due template di stampa PDF
 docker/                  entrypoint del container app
 ```
 
