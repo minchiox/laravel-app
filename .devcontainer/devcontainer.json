@@ -1,5 +1,5 @@
 {
-    "name": "MEXAM (Laravel · PHP 8.2)",
+    "name": "MEXAM (Laravel · PHP 8.4)",
 
     // Riusa il compose di progetto invece di definire un'immagine a parte:
     // un solo posto da aggiornare, nessuna deriva tra `docker compose up` e
@@ -57,7 +57,7 @@
             ],
             "settings": {
                 "php.validate.executablePath": "/usr/local/bin/php",
-                "intelephense.environment.phpVersion": "8.2",
+                "intelephense.environment.phpVersion": "8.4",
                 "files.eol": "\n",
                 "emmet.includeLanguages": { "blade": "html" },
                 "terminal.integrated.defaultProfile.linux": "bash",

@@ -116,6 +116,12 @@ COPY --from=assets /app/public/build /opt/mexam-assets/build
 COPY docker/entrypoint.sh /usr/local/bin/mexam-entrypoint
 RUN chmod +x /usr/local/bin/mexam-entrypoint
 
+# node_modules e' un volume anonimo (docker-compose.yml): Docker lo inizializza
+# copiando questo path dall'immagine, quindi va creato qui con owner www, o il
+# volume nasce root:root e "npm install" da devcontainer/postCreateCommand
+# (che gira come www) fallisce con EACCES.
+RUN mkdir -p /var/www/node_modules && chown www:www /var/www/node_modules
+
 USER www
 
 ENTRYPOINT ["mexam-entrypoint"]
