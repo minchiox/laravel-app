@@ -9,8 +9,12 @@ class UserAnswer extends Model
 {
     use HasFactory;
 
+    /** 'id' era mass assignable (la chiave primaria): stessa classe di falla
+     * gia' chiusa su Exam/User/Library.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
-        'id',
         'quiz_id',
         'user_id',
         'answer',

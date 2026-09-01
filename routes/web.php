@@ -102,7 +102,10 @@ Route::middleware(['auth', 'isTeacher'])->group(function () {
     // library.quiz mostra le risposte corrette nella colonna "Answer"
     Route::get('/libraryquiz/{id}/quiz', [LibraryQuizController::class, 'quiz_list'])->name('library.quiz');
     Route::post('/libraryquiz/{id}/quiz', [LibraryQuizController::class, 'quiz_list']);
-    Route::delete('/libraryquiz/delete/{id}', [LibraryQuizController::class, 'quiz_destroy'])->name('library.quiz.destroy');
+    // La rotta porta l'id della libreria oltre a quello del quiz: senza,
+    // il controller non sa da quale libreria scollegare il quiz e finiva per
+    // scollegarlo da tutte quelle a cui era associato.
+    Route::delete('/libraryquiz/{idlibrary}/quiz/{idquiz}', [LibraryQuizController::class, 'quiz_destroy'])->name('library.quiz.destroy');
     // Endpoint JSON usato dalla pagina "Add Quiz to Exam"
     Route::get('/libraries/{id}/quizzes', [LibraryQuizController::class, 'getQuizzes'])->name('libraries.quiz.exam');
 
@@ -118,7 +121,9 @@ Route::middleware(['auth', 'isTeacher'])->group(function () {
     Route::post('/examquiz', [ExamQuizController::class, 'store'])->name('examquiz.store');
     Route::get('/examquiz/{id}/quiz', [ExamQuizController::class, 'quiz_list'])->name('exam.quiz');
     Route::post('/examquiz/{id}/quiz', [ExamQuizController::class, 'quiz_list']);
-    Route::delete('/examquiz/delete/{id}', [ExamQuizController::class, 'quiz_destroy'])->name('exam.quiz.destroy');
+    // Stesso motivo della rotta gemella su library.quiz.destroy: serve l'id
+    // dell'esame per scollegare il quiz da quello soltanto.
+    Route::delete('/examquiz/{idexam}/quiz/{idquiz}', [ExamQuizController::class, 'quiz_destroy'])->name('exam.quiz.destroy');
 
     // --- Risultati e valutazione --------------------------------------
     // Erano protette dal solo `auth`: cambiando l'id nell'URL uno studente

@@ -50,25 +50,29 @@ class ExamQuizController extends Controller
 
     public function quiz_list($examId)
     {
-        $exam = Exam::find($examId);
+        $exam = Exam::findOrFail($examId);
         $quizzes= $exam->quiz()->get();
 
-        return view('exam.quizlist', ['quizzes' => $quizzes]);
+        return view('exam.quizlist', compact('exam', 'quizzes'));
     }
 
-    public function quiz_destroy($quizId)
+    /**
+     * `exam()->detach()` senza argomenti scollegava il quiz da OGNI esame a
+     * cui era associato, non solo da questo: un quiz condiviso fra piu' esami
+     * spariva ovunque rimuovendolo da uno solo. Il punteggio totale va
+     * ricalcolato dopo la rimozione, come in store().
+     */
+    public function quiz_destroy($examId, $quizId)
     {
-        $quizzes = Quiz::find($quizId);
+        $exam = Exam::findOrFail($examId);
+        $exam->quiz()->detach($quizId);
 
-        // Retrieve the library ID before detaching the quiz
-        $examId = $quizzes->exam()->first()->id;
-        $quizzes->exam()->detach();
+        $exam->total_points = $exam->quiz()->sum('points');
+        $exam->save();
 
-        $exam = Exam::with('quiz')->find($examId);
-        $quizzes = $exam->quiz;
+        $quizzes = $exam->quiz()->get();
 
-
-        return view('exam.quizlist', ['quizzes' => $quizzes]);
+        return view('exam.quizlist', compact('exam', 'quizzes'));
     }
 
     /**

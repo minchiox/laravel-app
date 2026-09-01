@@ -20,7 +20,10 @@ class LibraryController extends Controller
             'library_subject' => 'required',
         ]);
 
-        $input = $request->all();
+        // $request->all() lasciava passare qualunque campo del POST; con 'id'
+        // fra i $fillable bastava aggiungerlo al form per imporre la chiave
+        // primaria della riga creata.
+        $input = $request->only(['library_name', 'library_subject', 'library_difficulty']);
         $libraries = new Library();
         $libraries->fill($input);
         $libraries-> save();
@@ -53,9 +56,7 @@ class LibraryController extends Controller
         ]);
 
         $library = Library::findOrFail($id);
-        $input = $request->all();
-
-        //Se la risposta è booleana
+        $input = $request->only(['library_name', 'library_subject', 'library_difficulty']);
 
         // Salva le modifiche
         $library->update($input);
