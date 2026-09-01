@@ -23,6 +23,15 @@ class UserAnswer extends Model
         'exam_id',
     ];
 
+    /**
+     * Senza cast la colonna arriva dal DB come e' rappresentata dal driver
+     * (stringa o intero secondo i casi): il confronto con Quiz::$answer, gia'
+     * castato a boolean, non era affidabile.
+     */
+    protected $casts = [
+        'answer' => 'boolean',
+    ];
+
     public function quiz()
     {
         return $this->belongsTo(Quiz::class);
