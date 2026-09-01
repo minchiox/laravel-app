@@ -13,7 +13,7 @@ class CustomAuthController extends Controller
 {
     public function index()
     {
-        return view('auth.login');
+        return Inertia::render('auth/login');
     }
 
     public function customLogin(Request $request)
@@ -43,7 +43,7 @@ class CustomAuthController extends Controller
 
     public function registration()
     {
-        return view('auth.register');
+        return Inertia::render('auth/register');
     }
 
     public function customRegistration(Request $request)
