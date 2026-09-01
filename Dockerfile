@@ -1,6 +1,8 @@
-# syntax=docker/dockerfile:1
-#
 # Build multistage e riproducibile.
+#
+# Volutamente senza direttiva `# syntax=`: non serve nessuna feature del
+# frontend Dockerfile esterno, e chiederlo al registry aggiungeva un punto di
+# rottura di rete a ogni build.
 #
 # La versione precedente faceva `composer install` e subito dopo
 # `composer require barryvdh/laravel-dompdf laravel/ui` a build time, su
@@ -89,6 +91,15 @@ RUN composer install \
 FROM base AS dev
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
+
+# Strumenti richiesti dal VS Code Server quando ci si collega col devcontainer:
+# procps per la gestione dei suoi processi, wget come fallback di curl.
+# Stanno qui e non in `base` per non appesantire l'immagine di produzione.
+USER root
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends procps wget \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Asset gia' buildati: l'entrypoint li copia nel bind mount se public/build e'
 # vuoto, cosi' `docker compose up` da un clone pulito serve subito una pagina

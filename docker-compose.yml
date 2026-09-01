@@ -91,7 +91,7 @@ services:
     profiles: [dev]
     networks: [mexam]
 
-  # Prima era sempre attivo su :8081; ora va chiesto esplicitamente.
+  # Interfaccia di amministrazione del database.
   phpmyadmin:
     image: phpmyadmin:5
     container_name: mexam-phpmyadmin
@@ -102,11 +102,12 @@ services:
       # la chiave era scritta `-PMA_ARBITRARY: 1`, quindi ignorata
       PMA_HOST: db
       PMA_PORT: 3306
+      PMA_USER: ${DB_USERNAME:-mexam}
+      PMA_PASSWORD: ${DB_PASSWORD:-secret}
       UPLOAD_LIMIT: 40M
     depends_on:
       db:
         condition: service_healthy
-    profiles: [tools]
     networks: [mexam]
 
 networks:

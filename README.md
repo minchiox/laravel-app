@@ -1,66 +1,148 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# MEXAM
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Piattaforma per la creazione, lo svolgimento e la correzione di esami tra docenti e studenti.
 
-## About Laravel
+Un docente costruisce un archivio di domande (**quiz**), le raggruppa in **librerie** per materia e
+difficolta', e ne compone degli **esami** con una finestra temporale. Gli studenti svolgono l'esame
+online; il docente ne vede i risultati, li corregge e puo' stamparli in PDF.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Stack**: PHP 8.2 · Laravel 10 · MySQL 8 · Blade + Bootstrap 5 · Vite
+- **Ambiente**: Docker Compose, con devcontainer pronto per VS Code
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Avvio rapido
 
-## Learning Laravel
+Serve solo Docker. Non e' necessario avere PHP, Composer o Node installati.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+```bash
+git clone <url-del-repo> && cd laravel-app
+cp .env.example .env
+docker compose up -d --build
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Vengono avviati quattro servizi: l'app (php-fpm), nginx, MySQL e **phpMyAdmin** per ispezionare il
+database.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Il primo avvio richiede qualche minuto: il container installa le dipendenze, genera l'`APP_KEY`,
+esegue le migrazioni e popola il database di demo. Quando nei log compare `[mexam] pronto`, l'app e'
+su **<http://localhost:8088>**.
 
-## Laravel Sponsors
+```bash
+docker compose logs -f app     # per seguire l'avanzamento
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Credenziali di demo
 
-### Premium Partners
+| Ruolo    | Email                  | Password   |
+|----------|------------------------|------------|
+| Docente  | `docente@mexam.test`   | `password` |
+| Studente | `studente@mexam.test`  | `password` |
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+Ci sono altri due studenti (`giulia@mexam.test`, `luca@mexam.test`) con la stessa password.
 
-## Contributing
+Il seed crea tre esami, uno per ciascuno stato del ciclo di vita — **in corso** (Matematica: uno
+studente puo' aprirlo e consegnarlo subito), **non ancora iniziato** (Informatica) e **concluso**
+(Storia, gia' consegnato da due studenti, cosi' la pagina dei risultati ha qualcosa da mostrare).
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## Sviluppo
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Con il devcontainer (consigliato)
 
-## Security Vulnerabilities
+Apri la cartella in VS Code e scegli **Reopen in Container**: l'editor si collega al container `app`
+gia' in esecuzione, con PHP, Composer, le estensioni e il codice montato in `/var/www`. Il terminale
+integrato e' dentro il container, quindi `php artisan ...` funziona direttamente.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Node non e' installato nell'immagine PHP: per il frontend si usa il servizio `node` (`make dev`).
 
-## License
+### Con Docker da terminale
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Il `Makefile` copre i comandi ricorrenti:
+
+```bash
+make up            # avvia l'app
+make shell         # shell dentro il container
+make test          # esegue la suite
+make fresh         # ricrea il database e ripopola i dati di demo
+make pint          # formatta il codice
+make dev           # Vite in hot reload su :5273
+make dbshell       # client MySQL da terminale
+make down          # ferma tutto
+make help          # elenco completo
+```
+
+Senza `make`, ogni comando e' un `docker compose exec app <comando>`:
+
+```bash
+docker compose exec app php artisan migrate:fresh --seed
+docker compose exec app vendor/bin/phpunit
+```
+
+### Frontend
+
+Gli asset compilati sono gia' dentro l'immagine, quindi l'app funziona appena avviata. Per lavorare
+sul CSS/JS con hot reload serve il servizio Vite:
+
+```bash
+make dev           # oppure: docker compose --profile dev up node
+```
+
+### Porte
+
+Volutamente non standard, perche' 80, 8080, 9000, 6033 e 8081 sono spesso gia' occupate da altri
+progetti. Si cambiano in `.env`, senza toccare il `docker-compose.yml`.
+
+| Servizio    | Host                      | Variabile       |
+|-------------|---------------------------|-----------------|
+| App         | <http://localhost:8088>   | `APP_PORT`      |
+| MySQL       | `127.0.0.1:33061`         | `DB_PORT_HOST`  |
+| Vite HMR    | `127.0.0.1:5273`          | `VITE_PORT`     |
+| phpMyAdmin  | <http://localhost:8181>   | `PMA_PORT`      |
+
+---
+
+## Test
+
+```bash
+make test
+```
+
+La suite gira su SQLite in memoria (`phpunit.xml`), quindi non tocca il database di sviluppo.
+
+---
+
+## Struttura
+
+```
+app/Http/Controllers/    CustomAuth, Quiz, Library, LibraryQuiz, Exam, ExamQuiz, Profile
+app/Models/              User, Quiz, Library, Exam, UserAnswer
+app/Http/Middleware/     IsTeacher, IsStudent
+database/seeders/        dataset di demo coerente (utenti, quiz, librerie, esami)
+resources/views/         Blade, layout in auth/layouts.blade.php
+docker/                  entrypoint del container app
+```
+
+### Modello dei dati
+
+```
+User ──< exam_user >── Exam ──< exam_quiz >── Quiz ──< library_quiz >── Library
+                         │                     │
+                         └──── UserAnswer ─────┘
+```
+
+Un `Quiz` e' **a risposta chiusa** (`answer`, vero/falso) **oppure a risposta aperta**
+(`answer_text`), mai entrambe: e' l'invariante su cui si basano le view di svolgimento e la
+correzione.
+
+---
+
+## Note operative
+
+- **Riavvii successivi**: `docker compose up -d` non rifa' il seed. Per ripartire dai dati di demo,
+  `make fresh`.
+- **Avvio senza automatismi**: `MEXAM_AUTO_SETUP=false` in `.env` fa partire php-fpm senza eseguire
+  `composer install`, migrazioni e seed.
+- **Su Linux**: allinea `UID`/`GID` in `.env` al tuo utente (`id -u`, `id -g`) per non ritrovarti
+  file root-owned nel repo. Su macOS lasciali invariati.

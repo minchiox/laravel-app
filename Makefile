@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help up down build restart logs shell dbshell fresh seed test pint route-check dev tools clean
+.PHONY: help up down build restart logs shell dbshell fresh seed test pint pint-check route-check dev pma clean
 
 DC   := docker compose
 EXEC := $(DC) exec app
@@ -50,11 +50,11 @@ route-check: ## Elenca le rotte e verifica che route:cache non esploda
 	$(EXEC) php artisan route:cache
 	$(EXEC) php artisan route:clear
 
-dev: ## Avvia Vite in HMR su :5173
+dev: ## Avvia Vite in hot reload su :5273
 	$(DC) --profile dev up node
 
-tools: ## Avvia phpMyAdmin su :8081
-	$(DC) --profile tools up -d phpmyadmin
+pma: ## Apre phpMyAdmin nel browser
+	@open http://localhost:$${PMA_PORT:-8181} 2>/dev/null || echo "http://localhost:$${PMA_PORT:-8181}"
 
 clean: ## Ferma tutto e cancella il volume del database
 	$(DC) down -v

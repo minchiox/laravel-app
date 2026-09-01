@@ -9,17 +9,27 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class LibraryFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
+        $subject = $this->faker->randomElement(QuizFactory::SUBJECTS);
+        $difficulty = $this->faker->randomElement(QuizFactory::DIFFICULTIES);
+
         return [
-            'library_name' => fake()->name(),
-            'library_subject' => $this->faker->randomElement(['easy', 'medium', 'hard']),
-            'library_difficulty' => $this->faker->randomElement(['easy', 'medium', 'hard']),
+            // era fake()->name(), cioe' il nome di una persona come nome di una
+            // libreria di quiz
+            'library_name' => "{$subject} · livello {$difficulty}",
+            // era randomElement(['easy','medium','hard']): copia-incolla della
+            // riga difficulty, quindi la materia conteneva una difficolta'
+            'library_subject' => $subject,
+            'library_difficulty' => $difficulty,
         ];
+    }
+
+    public function subject(string $subject): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'library_subject' => $subject,
+            'library_name' => "{$subject} · livello {$attributes['library_difficulty']}",
+        ]);
     }
 }

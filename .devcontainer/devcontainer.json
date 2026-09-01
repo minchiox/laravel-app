@@ -2,10 +2,16 @@
     "name": "MEXAM (Laravel 10 · PHP 8.2)",
 
     // Riusa il compose di progetto invece di definire un'immagine a parte:
-    // un solo posto da aggiornare, nessuna deriva tra dev locale e devcontainer.
+    // un solo posto da aggiornare, nessuna deriva tra `docker compose up` e
+    // l'ambiente in cui si sviluppa.
     "dockerComposeFile": ["../docker-compose.yml"],
     "service": "app",
     "workspaceFolder": "/var/www",
+
+    // Senza questo VS Code avvierebbe solo `app` e le sue dipendenze, quindi
+    // nginx resterebbe giu' e il sito non sarebbe raggiungibile.
+    "runServices": ["app", "db", "webserver", "phpmyadmin"],
+
     "shutdownAction": "stopCompose",
     "remoteUser": "www",
 
@@ -16,29 +22,28 @@
                 "onecentlin.laravel-blade",
                 "amiralizadeh9480.laravel-extra-intellisense",
                 "EditorConfig.EditorConfig",
-                "xdebug.php-debug",
-                "esbenp.prettier-vscode"
+                "xdebug.php-debug"
             ],
             "settings": {
                 "php.validate.executablePath": "/usr/local/bin/php",
                 "intelephense.environment.phpVersion": "8.2",
                 "files.eol": "\n",
-                "[php]": {
-                    "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
-                },
                 "emmet.includeLanguages": {
                     "blade": "html"
-                }
+                },
+                "terminal.integrated.defaultProfile.linux": "bash"
             }
         }
     },
 
-    "forwardPorts": [80, 5173, 6033],
+    "forwardPorts": [8088, 8181, 33061],
     "portsAttributes": {
-        "80": { "label": "MEXAM" },
-        "5173": { "label": "Vite HMR" },
-        "6033": { "label": "MySQL" }
+        "8088": { "label": "MEXAM" },
+        "8181": { "label": "phpMyAdmin" },
+        "33061": { "label": "MySQL" }
     },
 
-    "postCreateCommand": "composer install --no-interaction && npm install"
+    // Solo Composer: Node vive nel servizio `node` del compose (profilo `dev`),
+    // per non appesantire l'immagine PHP. Per il frontend: `make dev`.
+    "postCreateCommand": "composer install --no-interaction"
 }
