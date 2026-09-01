@@ -25,6 +25,6 @@ class FlashMessageTest extends TestCase
         $response = $this->actingAs($docente)->delete(route('quiz.destroy', $quiz->id));
 
         $response->assertRedirect(route('quiz.list'));
-        $this->followRedirects($response)->assertSee('Quiz deleted successfully.');
+        $this->followRedirects($response)->assertSee('Quiz eliminato con successo.');
     }
 }

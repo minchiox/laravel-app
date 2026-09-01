@@ -6,12 +6,13 @@ use Illuminate\Http\Request;
 use App\Http\Requests\StoreQuizRequest;
 use App\Http\Requests\UpdateQuizRequest;
 use App\Models\Quiz;
+use Inertia\Inertia;
 
 class QuizController extends Controller
 {
     public function create()
     {
-        return view('quiz.quiz');
+        return Inertia::render('quiz/create');
     }
 
     public function search(Request $request)
@@ -20,6 +21,7 @@ class QuizController extends Controller
         // e' la risposta corretta, non e' materiale da poter sfogliare tra
         // docenti diversi.
         $query = Quiz::where('user_id', auth()->id());
+        $filters = $request->only(['question', 'difficulty', 'subject']);
 
         // Applica i filtri di ricerca
         if ($request->filled('question')) {
@@ -36,14 +38,26 @@ class QuizController extends Controller
 
         $quizzes = $query->get();
 
-        return view('quiz.index', compact('quizzes'));
+        return Inertia::render('quiz/index', [
+            // Quiz::$hidden esclude answer/answer_text dalla serializzazione
+            // JSON (Inertia la rispetta, a differenza dell'accesso Blade via
+            // proprieta'): qui vanno riesposte, la pagina e' teacher-only e
+            // mostra la risposta corretta di proposito.
+            'quizzes' => $quizzes->makeVisible(['answer', 'answer_text']),
+            'filters' => $filters,
+        ]);
     }
+
     public function list()
     {
         $quizzes = Quiz::where('user_id', auth()->id())->get();
 
-        return view('quiz.index', ['quizzes' => $quizzes]);
+        return Inertia::render('quiz/index', [
+            'quizzes' => $quizzes->makeVisible(['answer', 'answer_text']),
+            'filters' => [],
+        ]);
     }
+
     public function store(StoreQuizRequest $request)
     {
         $quiz = new Quiz();
@@ -51,7 +65,7 @@ class QuizController extends Controller
         $quiz->user_id = auth()->id();
         $quiz->save();
 
-        return back()->with('success', 'Quiz added successfully.');
+        return back()->with('success', 'Quiz aggiunto con successo.');
     }
 
     public function edit($id)
@@ -59,7 +73,9 @@ class QuizController extends Controller
         $quiz = Quiz::findOrFail($id);
         $this->authorize('update', $quiz);
 
-        return view('quiz.edit', compact('quiz'));
+        return Inertia::render('quiz/edit', [
+            'quiz' => $quiz->makeVisible(['answer', 'answer_text']),
+        ]);
     }
 
     public function update(UpdateQuizRequest $request, $id)
@@ -69,7 +85,7 @@ class QuizController extends Controller
         $quiz->update($this->normalizeAnswer($request->validated()));
 
         // Reindirizza con un messaggio di successo
-        return redirect()->route('quiz.edit', $id)->with('success', 'Quiz updated successfully.');
+        return redirect()->route('quiz.edit', $id)->with('success', 'Quiz aggiornato con successo.');
     }
 
     public function destroy($id)
@@ -79,7 +95,7 @@ class QuizController extends Controller
         $quiz->delete();
 
         // Reindirizza con un messaggio di successo
-        return redirect()->route('quiz.list')->with('success', 'Quiz deleted successfully.');
+        return redirect()->route('quiz.list')->with('success', 'Quiz eliminato con successo.');
     }
 
     /**
