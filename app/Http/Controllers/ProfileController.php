@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
+use Inertia\Inertia;
 
 class ProfileController extends Controller
 {
@@ -22,7 +23,19 @@ class ProfileController extends Controller
 
     public function index()
     {
-        return view('profile');
+        $user = auth()->user();
+
+        return Inertia::render('profile', [
+            // Prop dedicata invece di gonfiare auth.user/AuthUser condiviso
+            // con campi (phone, city) che servono solo a questa pagina.
+            'profileUser' => [
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'city' => $user->city,
+                'avatarUrl' => $user->avatar ? route('user.avatar', $user->avatar) : null,
+            ],
+        ]);
     }
 
 
@@ -66,7 +79,7 @@ class ProfileController extends Controller
 
         auth()->user()->update($input);
 
-        return back()->with('success', 'Profile updated successfully.');
+        return back()->with('success', 'Profilo aggiornato con successo.');
     }
 
     /**
