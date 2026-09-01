@@ -198,4 +198,20 @@ return [
 
     'same_site' => 'lax',
 
+    /*
+    |--------------------------------------------------------------------------
+    | Session Serialization
+    |--------------------------------------------------------------------------
+    |
+    | This value controls the serialization strategy for session data, which
+    | affects both storage size and serialization time. Using PHP's native
+    | serialization method is faster but exposes the application to a risk
+    | of "gadget chain" serialization attacks if the APP_KEY is leaked.
+    |
+    | Supported: "php", "json"
+    |
+    */
+
+    'serialization' => 'json',
+
 ];

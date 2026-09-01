@@ -108,4 +108,18 @@ return [
 
     'prefix' => env('CACHE_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_cache_'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Cache Serializable Classes
+    |--------------------------------------------------------------------------
+    |
+    | By default, Laravel allows classes to be serialized when caching. This
+    | can be a security risk, especially if the cache is not exclusively
+    | used by trusted parties. False disables serializing objects into
+    | cached values, preventing gadget chain deserialization attacks.
+    |
+    */
+
+    'serializable_classes' => false,
+
 ];
