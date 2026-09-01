@@ -1,75 +1,118 @@
-version: '3'
+# Ambiente di sviluppo MEXAM.
+#
+#   docker compose up -d --build          app su http://localhost
+#   docker compose --profile dev up node  Vite in HMR su :5173
+#   docker compose --profile tools up -d  phpMyAdmin su :8081
+#
+# Le credenziali arrivano da .env (prima erano root/root hardcoded qui dentro).
+
+name: mexam
+
 services:
-  
-  #PHP Service
+
   app:
     build:
       context: .
-      dockerfile: Dockerfile
-    image: digitalocean.com/php
-    container_name: app
+      target: dev
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    image: mexam/app:dev
+    container_name: mexam-app
     restart: unless-stopped
-    tty: true
-    environment:
-      SERVICE_NAME: app
-      SERVICE_TAGS: dev
     working_dir: /var/www
     volumes:
       - ./:/var/www
-      - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
-    networks:
-      - app-network
+      # node_modules resta nel container: contiene binari compilati per Linux
+      # che non devono mescolarsi con quelli dell'host.
+      # vendor/ invece resta sul bind mount, cosi' l'IDE puo' indicizzarlo.
+      - /var/www/node_modules
+    environment:
+      MEXAM_AUTO_SETUP: ${MEXAM_AUTO_SETUP:-true}
+      APP_PORT: ${APP_PORT:-8088}
+    depends_on:
+      db:
+        # Senza questa condizione il primo `migrate` falliva a caso perche'
+        # MySQL non aveva ancora finito di inizializzarsi.
+        condition: service_healthy
+    networks: [mexam]
 
-  #Nginx Service
   webserver:
-    image: nginx:alpine
-    container_name: webserver
+    image: nginx:1.27-alpine
+    container_name: mexam-nginx
     restart: unless-stopped
-    tty: true
     ports:
-      - "80:80"
-      - "443:443"
+      - "${APP_PORT:-8088}:80"
     volumes:
       - ./:/var/www
-      - ./nginx/conf.d/:/etc/nginx/conf.d/
-    networks:
-      - app-network
+      - ./nginx/conf.d/:/etc/nginx/conf.d/:ro
+    depends_on: [app]
+    networks: [mexam]
 
-  #MySQL Service
   db:
-    image: mysql:5.7.22
-    container_name: db
+    # mysql:5.7.22 era EOL da ottobre 2023
+    image: mysql:8.0
+    container_name: mexam-db
     restart: unless-stopped
-    tty: true
     ports:
-      - "6033:3306"
+      - "${DB_PORT_HOST:-33061}:3306"
     environment:
-      MYSQL_DATABASE: verunghi
-      MYSQL_ROOT_PASSWORD: root
-      SERVICE_TAGS: dev
-      SERVICE_NAME: mysql
+      MYSQL_DATABASE: ${DB_DATABASE:-mexam}
+      MYSQL_USER: ${DB_USERNAME:-mexam}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
     volumes:
       - dbdata:/var/lib/mysql
-      - ./mysql/my.cnf:/etc/mysql/my.cnf
-    networks:
-      - app-network
+      - ./mysql/my.cnf:/etc/mysql/conf.d/mexam.cnf:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-p${DB_ROOT_PASSWORD:-root}"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    networks: [mexam]
 
-  #PhpMyAdmin Service
-  phpmyadmin:
-    image: phpmyadmin:latest
+  # Vite in watch mode. Non parte di default: l'app funziona con gli asset
+  # gia' compilati, questo serve solo mentre si lavora sul frontend.
+  node:
+    image: node:20-alpine
+    container_name: mexam-node
+    working_dir: /app
+    volumes:
+      - ./:/app
     ports:
-      - "8081:80"
+      # host e container sulla stessa porta: l'HMR del browser si collega
+      # all'indirizzo che Vite scrive in public/hot, quindi le due devono
+      # coincidere.
+      - "${VITE_PORT:-5273}:${VITE_PORT:-5273}"
     environment:
-      -PMA_ARBITRARY: 1
-    restart: unless-stopped
-    networks:
-      - app-network
+      VITE_PORT: ${VITE_PORT:-5273}
+    command: sh -c "npm install && npm run dev"
+    profiles: [dev]
+    networks: [mexam]
 
-#Docker Networks
+  # Prima era sempre attivo su :8081; ora va chiesto esplicitamente.
+  phpmyadmin:
+    image: phpmyadmin:5
+    container_name: mexam-phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "${PMA_PORT:-8181}:80"
+    environment:
+      # la chiave era scritta `-PMA_ARBITRARY: 1`, quindi ignorata
+      PMA_HOST: db
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 40M
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles: [tools]
+    networks: [mexam]
+
 networks:
-  app-network:
+  mexam:
     driver: bridge
-#Volumes
+
 volumes:
   dbdata:
     driver: local

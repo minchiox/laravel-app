@@ -1,0 +1,48 @@
+# Senza questo file, `COPY . /var/www` finisce per infilare .git/ e .env
+# dentro l'immagine (segreti + storia completa del repo).
+
+# VCS e tooling
+.git
+.gitignore
+.gitattributes
+.github
+.devcontainer
+.editorconfig
+.styleci.yml
+.idea
+.vscode
+.fleet
+
+# Dipendenze e artefatti: ricostruiti dagli stage dedicati
+vendor
+node_modules
+public/build
+public/hot
+public/storage
+
+# Stato runtime
+storage/logs/*
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/views/*
+bootstrap/cache/*
+.phpunit.cache
+.phpunit.result.cache
+
+# Segreti
+.env
+.env.*
+!.env.example
+auth.json
+
+# Contenuti caricati/generati: non appartengono all'immagine
+public/pdf
+public/avatars
+
+# Docker e docs
+Dockerfile
+docker-compose.yml
+docker-compose.*.yml
+Makefile
+README.md
+CHANGELOG.md

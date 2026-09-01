@@ -1,64 +1,122 @@
-FROM php:8-fpm
+# syntax=docker/dockerfile:1
+#
+# Build multistage e riproducibile.
+#
+# La versione precedente faceva `composer install` e subito dopo
+# `composer require barryvdh/laravel-dompdf laravel/ui` a build time, su
+# pacchetti gia' presenti in composer.json: la build dipendeva dalla rete e
+# poteva risolvere versioni diverse da quelle del composer.lock.
+# Qui si installa esclusivamente da lockfile.
+#
+# Target disponibili:
+#   dev   -> usato da docker-compose e dal devcontainer (codice bind-mounted)
+#   prod  -> immagine autosufficiente con vendor e asset gia' dentro
 
-# Copy composer.lock and composer.json
-COPY composer.lock composer.json /var/www/
+ARG PHP_VERSION=8.2
+ARG NODE_VERSION=20
 
-# Set working directory
+# ---------------------------------------------------------------------------
+# Stage: assets — build Vite
+# ---------------------------------------------------------------------------
+FROM node:${NODE_VERSION}-alpine AS assets
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY vite.config.js ./
+COPY resources ./resources
+RUN npm run build
+
+# ---------------------------------------------------------------------------
+# Stage: base — runtime PHP condiviso
+# ---------------------------------------------------------------------------
+FROM php:${PHP_VERSION}-fpm-bookworm AS base
+
+ARG UID=1000
+ARG GID=1000
+
+# Estensioni: solo quelle realmente usate dall'app.
+# gd serve a dompdf per le immagini, pdo_mysql al database, zip a composer.
+ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+RUN chmod +x /usr/local/bin/install-php-extensions \
+    && install-php-extensions \
+        bcmath \
+        exif \
+        gd \
+        intl \
+        opcache \
+        pcntl \
+        pdo_mysql \
+        zip \
+    && rm -rf /tmp/*
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git unzip default-mysql-client \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
+
+# Utente non-root. UID/GID parametrici per allinearsi all'utente host su Linux
+# ed evitare file root-owned nel bind mount.
+RUN groupadd -g ${GID} www \
+    && useradd -u ${UID} -g ${GID} -ms /bin/bash www
+
+COPY php/local.ini /usr/local/etc/php/conf.d/zz-mexam.ini
+
 WORKDIR /var/www
 
-    ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+# ---------------------------------------------------------------------------
+# Stage: vendor — dipendenze di produzione, da lockfile
+# ---------------------------------------------------------------------------
+FROM base AS vendor
 
-RUN chmod +x /usr/local/bin/install-php-extensions && sync && \
-    install-php-extensions mbstring pdo_mysql zip exif pcntl gd
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
+COPY composer.json composer.lock ./
+RUN composer install \
+        --no-dev \
+        --no-scripts \
+        --no-autoloader \
+        --prefer-dist \
+        --no-interaction
 
-#previous code
-# Install dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    locales \
-    zip \
-    jpegoptim optipng pngquant gifsicle \
-    vim \
-    unzip \
-    git \
-    curl
+# ---------------------------------------------------------------------------
+# Stage: dev — bersaglio di compose e devcontainer
+# ---------------------------------------------------------------------------
+FROM base AS dev
 
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+# Asset gia' buildati: l'entrypoint li copia nel bind mount se public/build e'
+# vuoto, cosi' `docker compose up` da un clone pulito serve subito una pagina
+# funzionante senza passare da `npm run build` a mano.
+COPY --from=assets /app/public/build /opt/mexam-assets/build
 
-# Install extensions
-#RUN docker-php-ext-install
-#RUN docker-php-ext-configure gd --with-gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/
+COPY docker/entrypoint.sh /usr/local/bin/mexam-entrypoint
+RUN chmod +x /usr/local/bin/mexam-entrypoint
 
-# Install composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Add user for laravel application
-RUN groupadd -g 1000 www
-RUN useradd -u 1000 -ms /bin/bash -g www www
-
-#RUN php artisan key:generate
-
-# Copy existing application directory contents
-COPY . /var/www
-
-# Copy existing application directory permissions
-COPY --chown=www:www . /var/www
-
-# Change current user to www
 USER www
 
-# Run composer install to install dependencies
-RUN composer install
+ENTRYPOINT ["mexam-entrypoint"]
+CMD ["php-fpm"]
 
-# Install laravel-dompdf and laravel/ui packages
-RUN composer require barryvdh/laravel-dompdf laravel/ui
+# ---------------------------------------------------------------------------
+# Stage: prod — immagine autosufficiente
+# ---------------------------------------------------------------------------
+FROM base AS prod
 
-# Expose port 9000 and start php-fpm server
-EXPOSE 9000
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+COPY --chown=www:www . .
+COPY --from=vendor --chown=www:www /var/www/vendor ./vendor
+COPY --from=assets --chown=www:www /app/public/build ./public/build
+
+RUN composer dump-autoload --optimize --no-dev --no-interaction \
+    && chown -R www:www storage bootstrap/cache
+
+USER www
+
 CMD ["php-fpm"]

@@ -1,0 +1,44 @@
+{
+    "name": "MEXAM (Laravel 10 · PHP 8.2)",
+
+    // Riusa il compose di progetto invece di definire un'immagine a parte:
+    // un solo posto da aggiornare, nessuna deriva tra dev locale e devcontainer.
+    "dockerComposeFile": ["../docker-compose.yml"],
+    "service": "app",
+    "workspaceFolder": "/var/www",
+    "shutdownAction": "stopCompose",
+    "remoteUser": "www",
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "bmewburn.vscode-intelephense-client",
+                "onecentlin.laravel-blade",
+                "amiralizadeh9480.laravel-extra-intellisense",
+                "EditorConfig.EditorConfig",
+                "xdebug.php-debug",
+                "esbenp.prettier-vscode"
+            ],
+            "settings": {
+                "php.validate.executablePath": "/usr/local/bin/php",
+                "intelephense.environment.phpVersion": "8.2",
+                "files.eol": "\n",
+                "[php]": {
+                    "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
+                },
+                "emmet.includeLanguages": {
+                    "blade": "html"
+                }
+            }
+        }
+    },
+
+    "forwardPorts": [80, 5173, 6033],
+    "portsAttributes": {
+        "80": { "label": "MEXAM" },
+        "5173": { "label": "Vite HMR" },
+        "6033": { "label": "MySQL" }
+    },
+
+    "postCreateCommand": "composer install --no-interaction && npm install"
+}

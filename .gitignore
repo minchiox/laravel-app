@@ -17,3 +17,6 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+
+# Marker scritto dall'entrypoint Docker dopo il primo seed
+/storage/.mexam-seeded
